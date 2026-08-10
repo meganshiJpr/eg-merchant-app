@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   EG Merchant design tokens — ported from the approved prototype.
+   Theme switching: <html data-preset="eg" data-mode="light|dark">
+   ============================================================ */
+
+:root,
+[data-preset="eg"] {
+  --primary: #0112fe;
+  --primary-soft: #e8e9ff;
+  --accent: #f10c5f;
+  --accent-soft: #fde7ef;
+  --teal: #00a389;
+  --teal-soft: #e0f5f1;
+  --orange: #f07800;
+  --orange-soft: #fdefe0;
+  --violet: #7b2fbe;
+  --violet-soft: #f1e7fa;
+
+  --page: #f4f5f9;
+  --surface: #ffffff;
+  --surface-2: #eef0f6;
+  --border: #e4e7ef;
+  --text-1: #14161f;
+  --text-2: #4c5165;
+  --text-3: #9498a8;
+}
+
+/* Dark mode uses brighter, more saturated brand variants (locked decision) */
+[data-mode="dark"] {
+  --primary: #5a63ff;
+  --primary-soft: #1c2050;
+  --accent: #ff4d8d;
+  --accent-soft: #43102a;
+  --teal: #23c9ad;
+  --teal-soft: #0d322c;
+  --orange: #ffa03d;
+  --orange-soft: #3a2710;
+  --violet: #a86ae0;
+  --violet-soft: #2c1745;
+
+  --page: #0e0f15;
+  --surface: #181a23;
+  --surface-2: #20232f;
+  --border: #2a2d3a;
+  --text-1: #f2f3f8;
+  --text-2: #b6bac9;
+  --text-3: #6d7285;
+}
+
+html,
+body {
+  background: var(--page);
+  color: var(--text-1);
+  font-family: var(--font-plex), system-ui, sans-serif;
+}
+
+/* Amounts, IDs, account numbers */
+.mono {
+  font-family: var(--font-plex-mono), monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
