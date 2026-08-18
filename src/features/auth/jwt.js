@@ -1,0 +1,36 @@
+export const SSO_TTL_SECONDS = 5 * 60;
+
+function base64UrlDecode(input) {
+  const b64 = input.replace(/-/g, "+").replace(/_/g, "/")
+    .padEnd(input.length + ((4 - (input.length % 4)) % 4), "=");
+  const bin = atob(b64);
+  const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+export function decodeSsoClaims(token) {
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+  try {
+    const j = JSON.parse(base64UrlDecode(parts[1]));
+    if (typeof j?.name === "string" && typeof j?.shopname === "string" && typeof j?.iat === "number") {
+      return j;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function checkSsoFreshness(token, skewSeconds = 60) {
+  const claims = decodeSsoClaims(token);
+  if (!claims) return { ok: false, reason: "malformed" };
+
+  const now = Math.floor(Date.now() / 1000);
+  if (claims.iat - now > skewSeconds) return { ok: false, reason: "future" };
+
+  const expiry = claims.exp ?? claims.iat + SSO_TTL_SECONDS;
+  if (now - expiry > skewSeconds) return { ok: false, reason: "expired" };
+
+  return { ok: true, claims };
+}
