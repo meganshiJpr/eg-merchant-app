@@ -9,6 +9,8 @@ import { useRecharge } from "@/features/recharge/store";
 import { Sheet } from "@/components/ui/Sheet";
 import { MpinSheet } from "@/features/recharge/components/MpinSheet";
 import { inr } from "@/utils/format";
+import { fetchPaymentDetails } from "@/features/recharge/api";
+import { ViewPlan } from "./ViewPlan";
 
 const UPI_APPS = [
   { n: "PhonePe", c: "#5F259F", a: "Pe" },
@@ -28,6 +30,7 @@ function statusFromPin(pin) {
 export function PayScreen() {
   const router = useRouter();
   const req = usePay((s) => s.req);
+  const flow = useRecharge();
   const wallet = useWallet();
   const toast = useToast((t) => t.show);
   const setReceipt = useRecharge((s) => s.set);
@@ -38,6 +41,29 @@ export function PayScreen() {
   const [upiStatus, setUpiStatus] = useState("");
   const [mpinOpen, setMpinOpen] = useState(false);
   const [upiTopped, setUpiTopped] = useState(false);
+  const [loadingBillerPayment, setLoadingBillerPayment] = useState(false);
+  const [showPlans, setShowPlans] = useState(false);
+
+  const planDetailsData = req?.details || flow?.details || null;
+
+  const handlePlanSelect = (selectedPlan) => {
+    const selectedAmount = Number(
+      selectedPlan.rs ??
+      selectedPlan.amount ??
+      selectedPlan.price ??
+      0
+    );
+
+    if (selectedAmount > 0) {
+      setAmountStr(String(selectedAmount));
+      setReceipt({
+        amount: selectedAmount,
+        billAmount: selectedAmount,
+        plan: selectedPlan,
+      });
+    }
+    setShowPlans(false);
+  };
 
   useEffect(() => {
     if (!req) {
@@ -56,6 +82,8 @@ export function PayScreen() {
   }, [req, amountStr]);
 
   if (!req) return null;
+
+  console.log("request reponse",req)
 
   const amtOk = req.editableAmount ? amount >= req.amin && amount <= req.amax : amount > 0;
   const walletUsable = useWalletBal && req.walletAllowed ? wallet.balance : 0;
@@ -107,21 +135,38 @@ export function PayScreen() {
       ? upiOnly
         ? `Pay Rs ${inr(short)} via UPI`
         : `Add Rs ${inr(short)} & Proceed`
-      : `${req.mode === "bill" ? "Pay" : "Recharge"} Rs ${inr(amount)}`;
+      : `${req.mode === "bill" ? "Proceed to pay" : "Recharge"}`;
 
   return (
     <div className="flex flex-col gap-3 p-4 pb-24">
       {/* Selected entity */}
-      <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-3.5 py-3">
+      <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-3.5 py-3 shadow-2xs">
+        {req.avatar?.logo ? (
+          <img
+            src={req.avatar.logo}
+            alt={req.line1}
+            className="h-10 w-10 flex-none rounded-xl border border-border bg-page object-cover shadow-2xs"
+            onError={(e) => {
+              e.target.style.display = "none";
+              if (e.target.nextSibling) e.target.nextSibling.style.display = "flex";
+            }}
+          />
+        ) : null}
         <span
-          className="flex h-9 w-9 flex-none items-center justify-center rounded-full font-display text-[12px] font-bold text-white"
-          style={{ background: req.avatar.color }}
+          className="flex h-10 w-10 flex-none items-center justify-center rounded-xl font-display text-[12px] font-bold text-white shadow-2xs"
+          style={{
+            background: req.avatar?.color || "var(--primary)",
+            display: req.avatar?.logo ? "none" : "flex",
+          }}
         >
-          {req.avatar.text}
+          {req.avatar?.text}
         </span>
-        <div className="min-w-0">
-          <div className="text-[13.5px] font-semibold">{req.line1}</div>
-          <div className="text-[11.5px] text-text-2">{req.line2}</div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[13.5px] font-bold text-text-1">{req.custName}</div>
+          <div className="flex gap-1">
+            <span className="text-[11.5px] font-medium text-text-3">{req.account} •</span>
+          <div className="text-[11.5px] font-medium text-text-3">{req.line1}</div>
+          </div>
         </div>
       </div>
 
@@ -138,8 +183,29 @@ export function PayScreen() {
         ) : (
           <div className="mono text-[40px] font-semibold tracking-tight">Rs {inr(amount)}</div>
         )}
+
+        {/* HORIZONTAL AMOUNT RECOMMENDATION CHIPS (SLABS) */}
+        {req.slabs && req.slabs.length > 0 && (
+          <div className="mt-3.5 flex items-center justify-center gap-2 overflow-x-auto no-scrollbar py-1">
+            {req.slabs.map((slabVal) => (
+              <button
+                key={slabVal}
+                type="button"
+                onClick={() => onAmt(String(slabVal))}
+                className={`flex-none rounded-full border px-3.5 py-1 text-[12.5px] font-bold transition active:scale-95 shadow-2xs ${
+                  amount === Number(slabVal)
+                    ? "border-primary bg-primary text-white"
+                    : "border-border bg-surface text-text-1 hover:border-primary/50"
+                }`}
+              >
+                Rs {inr(slabVal)}
+              </button>
+            ))}
+          </div>
+        )}
+
         {req.editableAmount && (
-          <div className="mono mt-1 text-[12px] font-semibold text-text-3">
+          <div className="mono mt-1.5 text-[12px] font-semibold text-text-3">
             Min Rs {inr(req.amin)} · Max Rs {inr(req.amax)}
           </div>
         )}
@@ -147,6 +213,15 @@ export function PayScreen() {
           <div className="mt-2 rounded-xl bg-primary-soft px-4 py-2.5 text-left text-[11.5px] leading-relaxed text-primary">
             {req.customNote}
           </div>
+        )}
+        {planDetailsData && (
+          <button
+            type="button"
+            onClick={() => setShowPlans(true)}
+            className="mt-2.5 inline-flex items-center gap-1.5 text-[12.5px] font-bold text-primary active:scale-95 transition cursor-pointer hover:underline"
+          >
+            <span>View plan</span>
+          </button>
         )}
       </div>
 
@@ -165,82 +240,113 @@ export function PayScreen() {
       )}
 
       {/* Fetched bill/customer data (bill mode) */}
-      {req.fetched && (
-        <div className="rounded-2xl border border-border bg-surface px-4 py-1">
+      {req.fetched && req.fetched.rows && req.fetched.rows.length > 0 && (
+        <div className="rounded-2xl border border-border bg-surface px-4 py-1 shadow-2xs">
           <div className="flex items-center gap-2 py-2.5 text-[12px] font-bold text-teal">
             <svg viewBox="0 0 24 24" className="h-[15px] w-[15px]">
               <path d="M6 12.5 10.2 16.7 18 8.5" stroke="var(--teal)" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             {req.fetched.title}
           </div>
-          {req.fetched.rows.map((r) => (
-            <div key={r.k} className="flex justify-between border-t border-border py-2.5 text-[12.5px]">
-              <span className="text-text-3">{r.k}</span>
-              <span className="font-semibold">{r.v}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Wallet toggle */}
-      <div className="rounded-2xl border border-border bg-surface p-3.5">
-        <div className="flex items-center gap-3">
-          <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-primary-soft">
-            <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] fill-primary">
-              <path d="M20 6H5.5A1.5 1.5 0 0 1 5.5 3H19V1H5.5A3.5 3.5 0 0 0 2 4.5V19a3 3 0 0 0 3 3h15a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2Zm-3.5 9.5A1.75 1.75 0 1 1 18.25 13.75 1.75 1.75 0 0 1 16.5 15.5Z" />
-            </svg>
-          </span>
-          <div className="min-w-0 flex-1">
-            <div className="text-[12.5px] font-semibold text-text-2">Use wallet balance</div>
-            <div className={`mono mt-0.5 text-[13px] font-semibold ${useWalletBal && req.walletAllowed && wallet.balance < amount ? "text-accent" : ""}`}>
-              Rs {inr(wallet.balance)} available
-            </div>
-          </div>
-          <button
-            aria-label="Toggle wallet"
-            onClick={() => {
-              if (!req.walletAllowed) {
-                toast(`Wallet not allowed for ${req.line1}`);
-                return;
-              }
-              setUseWalletBal((v) => !v);
-            }}
-            className={`relative h-6 w-11 flex-none rounded-full transition ${useWalletBal && req.walletAllowed ? "bg-primary" : "bg-border"} ${req.walletAllowed ? "" : "opacity-35"}`}
-          >
-            <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${useWalletBal && req.walletAllowed ? "left-[22px]" : "left-0.5"}`} />
-          </button>
-        </div>
-        {!req.walletAllowed && (
-          <div className="mt-2.5 flex gap-2 text-[11px] font-semibold leading-relaxed text-accent">
-            <svg viewBox="0 0 24 24" className="mt-0.5 h-3.5 w-3.5 flex-none fill-accent">
-              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 15h-2v-6h2Zm0-8h-2V7h2Z" />
-            </svg>
-            Wallet payment is not allowed for this operator. Only UPI payment is available.
-          </div>
-        )}
-      </div>
-
-      {/* Calculation */}
-      {amtOk && (
-        <div className="rounded-2xl border border-border bg-surface p-3.5 text-[12.5px]">
-          <Row label={req.mode === "bill" ? "Bill amount" : "Recharge amount"} value={`Rs ${inr(amount)}`} />
-          <Row label="Paid from wallet" value={`Rs ${inr(walletPortion)}`} />
-          {short > 0 && <Row label="Amount to add" value={`Rs ${inr(short)}`} accent />}
-          <div className="mt-2 flex justify-between border-t border-dashed border-border pt-2.5 text-[13.5px] font-bold">
-            <span>{short > 0 ? (upiOnly ? "Payable via UPI" : "Payable now (add via UPI)") : "Total from wallet"}</span>
-            <span className="mono text-[15px]">Rs {inr(short > 0 ? short : amount)}</span>
-          </div>
+          {req.fetched.rows
+            .filter((r) => r.v !== null && r.v !== undefined && String(r.v).trim() !== "")
+            .map((r) => (
+              <div key={r.k} className="flex justify-between border-t border-border py-2.5 text-[12.5px]">
+                <span className="text-text-3">{r.k}</span>
+                <span className="font-semibold text-text-1">{r.v}</span>
+              </div>
+            ))}
         </div>
       )}
 
       {/* Action */}
       <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-app border-t border-border bg-surface p-3">
         <button
-          disabled={!amtOk}
-          onClick={() => (short > 0 ? setUpiOpen(true) : setMpinOpen(true))}
-          className="w-full rounded-xl bg-primary px-4 py-3.5 font-display text-[13.5px] font-semibold text-white active:scale-[0.985] disabled:opacity-40 disabled:active:scale-100"
+          disabled={!amtOk || loadingBillerPayment}
+          onClick={async () => {
+            if (req.mode === "bill") {
+              const finalAmount = Number(amount);
+              const sessionId = String(flow.session_id || req.session_id || "").trim();
+              const activeNum = String(flow.num || req.account || "").replace(/\D/g, "").trim();
+              const opId = String(flow.operator || req.opId || "38").trim();
+              const catType = String(flow.serviceType || req.categoryType || "DTH").trim();
+
+              // Validation before fetchPaymentDetails
+              if (!sessionId) {
+                toast("Invalid session ID for current transaction.");
+                console.error("fetchPaymentDetails blocked: Missing session_id", { flow, req });
+                return;
+              }
+              if (!activeNum) {
+                toast("Invalid subscriber/account number.");
+                console.error("fetchPaymentDetails blocked: Missing subscriber/account number", { flow, req });
+                return;
+              }
+              if (!opId) {
+                toast("Invalid operator ID.");
+                console.error("fetchPaymentDetails blocked: Missing operator ID", { flow, req });
+                return;
+              }
+              if (!catType) {
+                toast("Invalid service category type.");
+                console.error("fetchPaymentDetails blocked: Missing serviceType", { flow, req });
+                return;
+              }
+              if (!finalAmount || finalAmount <= 0) {
+                toast("Payment amount must be greater than 0.");
+                console.error("fetchPaymentDetails blocked: Amount <= 0", { amount: finalAmount });
+                return;
+              }
+
+              setLoadingBillerPayment(true);
+              try {
+                const reqPayload = {
+                  amount: finalAmount,
+                  session_id: sessionId,
+                  operator: opId,
+                  number: activeNum,
+                  type: catType,
+                  circle: String(flow.circle || "14"),
+                  field1: "", field2: "", field3: "", field4: "",
+                  refresh: false, billDetails: "",
+                  biometric_enabled: 0, is_key_active: 0,
+                };
+                console.log("Triggering fetchPaymentDetails API:", reqPayload);
+
+                const response = await fetchPaymentDetails(reqPayload);
+
+                flow.set({
+                  amount: finalAmount,
+                  billAmount: finalAmount,
+                  session_id: sessionId,
+                  num: activeNum,
+                  operator: opId,
+                  serviceType: catType,
+                  paymentDetails: response,
+                });
+
+                router.push("/recharge/receipt");
+              } catch (err) {
+                console.error("fetchPaymentDetails Error on Proceed click:", err);
+                toast(err?.message || "Unable to fetch payment details. Please try again.");
+              } finally {
+                setLoadingBillerPayment(false);
+              }
+            } else {
+              if (short > 0) setUpiOpen(true);
+              else setMpinOpen(true);
+            }
+          }}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 font-display text-[13.5px] font-semibold text-white active:scale-[0.985] disabled:opacity-40 disabled:active:scale-100 transition shadow-xs"
         >
-          {btnLabel}
+          {loadingBillerPayment ? (
+            <>
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <span>Fetching payment details...</span>
+            </>
+          ) : (
+            <span>Proceed to Pay</span>
+          )}
         </button>
       </div>
 
@@ -264,6 +370,14 @@ export function PayScreen() {
       </Sheet>
 
       <MpinSheet open={mpinOpen} onClose={() => setMpinOpen(false)} onComplete={(pin) => { setMpinOpen(false); finish(statusFromPin(pin), paidVia, walletPortion); }} />
+
+      {showPlans && (
+        <ViewPlan
+          details={planDetailsData}
+          onBack={() => setShowPlans(false)}
+          onSelectPlan={handlePlanSelect}
+        />
+      )}
     </div>
   );
 }

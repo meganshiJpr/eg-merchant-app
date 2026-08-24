@@ -4,11 +4,11 @@ export const serviceGroups = [
     barColor: "var(--primary)",
     items: [
       { key: "mobile", label: "Mobile", color: "var(--primary)", soft: "var(--primary-soft)", href: "/recharge" },
-      { key: "dth", label: "DTH", color: "var(--accent)", soft: "var(--accent-soft)", href: "/billers?cat=0" },
-      { key: "electricity", label: "Electricity", color: "var(--orange)", soft: "var(--orange-soft)", href: "/billers?cat=1" },
-      { key: "water", label: "Water", color: "var(--teal)", soft: "var(--teal-soft)", href: "/billers?cat=2" },
-      { key: "gas", label: "Gas", color: "var(--violet)", soft: "var(--violet-soft)", href: "/billers?cat=3" },
-      { key: "fastag", label: "FASTag", color: "var(--primary)", soft: "var(--primary-soft)", href: "/billers?cat=4" },
+      { key: "dth", label: "DTH", color: "var(--accent)", soft: "var(--accent-soft)", href: "/billers?type=DTH" },
+      { key: "electricity", label: "Electricity", color: "var(--orange)", soft: "var(--orange-soft)", href: "/billers?type=Electricity" },
+      { key: "water", label: "Water", color: "var(--teal)", soft: "var(--teal-soft)", href: "/billers?type=Water" },
+      { key: "gas", label: "Gas", color: "var(--violet)", soft: "var(--violet-soft)", href: "/billers?type=Gas" },
+      { key: "fastag", label: "FASTag", color: "var(--primary)", soft: "var(--primary-soft)", href: "/billers?type=FASTag" },
     ],
   },
   {

@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { NumberEntry } from "@/features/recharge/components/NumberEntry";
-import { SelectedNumber } from "@/features/recharge/components/SelectedNumber";
-import { PlanList } from "@/features/recharge/components/PlanList";
 import { useRecharge } from "@/features/recharge/store";
 import { fetchRechargeHistory } from "@/features/recharge/api";
 
@@ -12,7 +10,6 @@ export default function RechargePage() {
   const router = useRouter();
   const flow = useRecharge();
   const [rechargeHistory, setRechargeHistory] = useState(null);
-  const [stage, setStage] = useState(flow.operator ? "plans" : "entry");
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
   const hasFetchedRef = useRef(false);
@@ -20,7 +17,6 @@ export default function RechargePage() {
   useEffect(() => {
     if (hasFetchedRef.current) return;
     hasFetchedRef.current = true;
-
 
     async function getRechargeHistory() {
       try {
@@ -36,13 +32,13 @@ export default function RechargePage() {
   }, []);
 
   function back() {
-    if (stage === "plans") {
-      flow.reset();
-      setStage("entry");
-    } else {
-      router.push("/");
-    }
+    flow.reset();
+    router.push("/");
   }
+
+  const handleDetected = useCallback(() => {
+    router.push("/recharge/plans");
+  }, [router]);
 
   const sliderData = rechargeHistory?.sliders;
   const slidePath = sliderData?.slide_path || "";
@@ -61,7 +57,7 @@ export default function RechargePage() {
         <button
           onClick={back}
           aria-label="Back"
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface shadow-xs active:scale-95 transition"
         >
           <svg viewBox="0 0 24 24" className="h-4 w-4 fill-text-1">
             <path d="M15.5 4.5 8 12l7.5 7.5-1.8 1.8L4.4 12l9.3-9.3Z" />
@@ -75,15 +71,11 @@ export default function RechargePage() {
         <div
           className="group relative mb-4 cursor-pointer overflow-hidden"
           onClick={handleSlideClick}
-          style={{
-            // margin:`${styles.padding}px`,
-          }}
         >
           <div
             className="relative w-full overflow-hidden"
             style={{
               height: `${styles.height}%`,
-              // borderRadius: `${styles.cornerRadius}px`,
               borderRadius: `11px`,
             }}
           >
@@ -114,18 +106,10 @@ export default function RechargePage() {
         </div>
       )}
 
-      {stage === "entry" && (
-        <NumberEntry
-          historyData={rechargeHistory}
-          onDetected={() => setStage("plans")}
-        />
-      )}
-      {stage === "plans" && (
-        <>
-          <SelectedNumber onEdit={back} />
-          <PlanList />
-        </>
-      )}
+      <NumberEntry
+        historyData={rechargeHistory}
+        onDetected={handleDetected}
+      />
     </div>
   );
 }

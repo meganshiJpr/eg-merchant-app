@@ -1,5 +1,7 @@
 import { transport } from "./config";
 import { useAuthStore } from "@/lib/auth/store";
+import { useSessionExpiryStore } from "@/lib/auth/sessionExpiryStore";
+import Cookies from "js-cookie";
 
 export class ApiError extends Error {
   constructor(status, code, message, data) {
@@ -11,23 +13,34 @@ export class ApiError extends Error {
 }
 
 /**
- * Central session-expiry handler. Clears stored auth and redirects to the
- * public SSO/login screen.
+ * Central session-expiry handler. It blocks the app with a global overlay;
+ * the user must close the app/tab and start a fresh SSO session.
  */
 function handleSessionExpired() {
+  useSessionExpiryStore.getState().showExpired();
   useAuthStore.getState().clear();
-  if (typeof window !== "undefined" && window.location.pathname !== "/sso") {
-    window.location.replace("/sso?expired=1");
+  if (typeof window !== "undefined") {
+    Cookies.remove("authToken");
+    Cookies.remove("authMobile");
   }
 }
 
 /** True when a success:0 envelope means the session is gone. */
 function isExpiredMessage(message) {
-  return (message ?? "").trim().toUpperCase() === "EXPIRED";
+  return ["EXPIRED", "SESSION EXPIRED", "SESSION_EXPIRED", "TOKEN EXPIRED", "TOKEN_EXPIRED"].includes(
+    String(message ?? "").trim().toUpperCase(),
+  );
 }
 
 export async function request(path, opts = {}) {
   const { method = "GET", body, auth = true, headers, signal } = opts;
+
+  // Do not let additional requests run once a confirmed expiry has blocked
+  // the application. This avoids repeated API errors behind the overlay.
+  if (useSessionExpiryStore.getState().expired) {
+    throw new ApiError(440, "SESSION_EXPIRED", "Session expired.");
+  }
+
   const token = auth ? useAuthStore.getState().token : null;
 
   let res;
@@ -39,11 +52,12 @@ export async function request(path, opts = {}) {
   }
 
   // HTTP-level revoked/expired token.
-  if (res.status === 401) {
+  if ([401, 419, 440].includes(res.status)) {
     handleSessionExpired();
     throw new ApiError(401, "SESSION_EXPIRED", "Session expired. Please log in again.");
   }
 
+  
   const payload = res.data;
 
   // HTTP-level failure (5xx, 404, ...) with no usable envelope.
@@ -56,7 +70,7 @@ export async function request(path, opts = {}) {
     const ok = payload.success === 1 || payload.success === true;
     if (!ok) {
       // App-level session expiry (success:0, message "EXPIRED").
-      if (isExpiredMessage(payload.message)) {
+      if (isExpiredMessage(payload.message) || isExpiredMessage(payload.code)) {
         handleSessionExpired();
         throw new ApiError(440, "SESSION_EXPIRED", "Session expired. Please log in again.", payload);
       }

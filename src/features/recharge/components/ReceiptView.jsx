@@ -1,131 +1,605 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useRecharge } from "../store";
+import { fetchPaymentDetails } from "../api";
 import { inr } from "@/utils/format";
-import { useToast } from "@/components/ui/Toast";
+import { resolveOperatorCircleInfo } from "../utils/operatorHelper";
+import { Sheet } from "@/components/ui/Sheet";
 
-const STATUS = {
-  success: {
-    title: "Recharge Successful",
-    sub: "Benefits are active on the number now",
-    note: "Amount debited from wallet. Commission will reflect in your reports shortly.",
-    fg: "var(--teal)",
-    bg: "var(--teal-soft)",
-    icon: (
-      <path d="M6 12.5 10.2 16.7 18 8.5" stroke="var(--teal)" strokeWidth="2.8" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    ),
-  },
-  processing: {
-    title: "Recharge Processing",
-    sub: "Operator is confirming this recharge",
-    note: "Status updates automatically within 10 minutes. Amount is held from wallet and auto-refunded if the recharge fails.",
-    fg: "var(--orange)",
-    bg: "var(--orange-soft)",
-    icon: <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm4 11h-5V6h2v5h3Z" fill="var(--orange)" />,
-  },
-  failed: {
-    title: "Recharge Failed",
-    sub: "The operator rejected this recharge",
-    note: "No amount deducted. If any hold was placed, it is reversed to your wallet immediately.",
-    fg: "var(--accent)",
-    bg: "var(--accent-soft)",
-    icon: (
-      <path d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3Z" fill="var(--accent)" />
-    ),
-  },
-  refunded: {
-    title: "Amount Refunded",
-    sub: "Recharge could not complete · money returned",
-    note: "Full amount has been refunded to your wallet. You can retry the recharge anytime.",
-    fg: "var(--violet)",
-    bg: "var(--violet-soft)",
-    icon: <path d="M12 5V1L6 7l6 6V9a6 6 0 1 1-6 6H3.5A8.5 8.5 0 1 0 12 5Z" fill="var(--violet)" />,
-  },
-};
+const BG_COLORS = ["#E40000", "#7B2CBF", "#0A2885", "#EE2E7B", "#00A896"];
+
+function BenefitAvatar({ item, index }) {
+  const title = item?.title || item?.name || "B";
+  const initial = title[0].toUpperCase();
+  const bg = BG_COLORS[index % BG_COLORS.length];
+
+  if (item?.image_url) {
+    const imgPath = item.image_url.startsWith("http")
+      ? item.image_url
+      : `https://blr1.digitaloceanspaces.com/egpaymentuhfivgruiaslasfmiaronoa/collection/storage/${item.image_url}`;
+    return (
+      <img
+        src={imgPath}
+        alt={title}
+        className="h-6 w-6 flex-none rounded-lg object-cover shadow-2xs"
+        onError={(e) => {
+          e.target.style.display = "none";
+          if (e.target.nextSibling) e.target.nextSibling.style.display = "flex";
+        }}
+      />
+    );
+  }
+
+  return (
+    <span
+      className="flex h-7 w-7 flex-none items-center justify-center rounded-lg font-display text-[11px] font-extrabold text-white shadow-2xs"
+      style={{ backgroundColor: bg }}
+    >
+      {initial}
+    </span>
+  );
+}
 
 export function ReceiptView() {
   const router = useRouter();
   const flow = useRecharge();
-  const toast = useToast((t) => t.show);
-  const r = flow.receipt;
+  const [useWallet, setUseWallet] = useState(true);
+  const [loadingPaymentDetails, setLoadingPaymentDetails] = useState(false);
+  const [paymentDetailsError, setPaymentDetailsError] = useState("");
+  const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
 
+  // Biller Customer Information Card visibility states
+  const [showCustomerCard, setShowCustomerCard] = useState(false);
+  const [expandedCustomerCard, setExpandedCustomerCard] = useState(false);
+
+  const receipt = flow.receipt;
+  const plan = flow.plan;
+  const paymentDetails = flow.paymentDetails;
+  const isBillerMode = flow.serviceType !== "Prepaid" || flow.mode === "bill";
+
+  // 1. COMPLETED RECEIPT SCREEN (When transaction finishes from PayScreen)
+  if (receipt) {
+    const isSuccess = receipt.status === "success" || receipt.status === "processing";
+
+    const billdataRows = [];
+    if (receipt.billdata?.rows) {
+      receipt.billdata.rows.forEach((r) => {
+        if (r.v !== null && r.v !== undefined && String(r.v).trim() !== "") {
+          billdataRows.push(r);
+        }
+      });
+    } else if (receipt.rawBilldata) {
+      Object.entries(receipt.rawBilldata).forEach(([k, v]) => {
+        if (v !== null && v !== undefined && String(v).trim() !== "") {
+          billdataRows.push({ k, v: String(v).trim() });
+        }
+      });
+    }
+
+    return (
+      <div className="min-h-screen bg-[#f4f5fa] pb-12 p-4 flex flex-col gap-4">
+        {/* Status Header Banner */}
+        <div className="flex flex-col items-center justify-center pt-6 text-center">
+          <span
+            className={`flex h-14 w-14 items-center justify-center rounded-full text-white shadow-md ${
+              isSuccess ? "bg-emerald-500" : "bg-rose-500"
+            }`}
+          >
+            <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-current" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              {isSuccess ? <path d="M5 13l4 4L19 7" /> : <path d="M18 6L6 18M6 6l12 12" />}
+            </svg>
+          </span>
+
+          <h2 className="mt-3 font-display text-[20px] font-bold text-text-1">
+            {isSuccess ? "Transaction Successful" : "Transaction Failed"}
+          </h2>
+          <div className="mono mt-1 text-[28px] font-extrabold text-text-1">
+            Rs {inr(receipt.amount)}
+          </div>
+        </div>
+
+        {/* Transaction Details */}
+        <div className="rounded-2xl border border-border bg-surface px-4 py-3 shadow-2xs">
+          <div className="mb-2 text-[12px] font-bold uppercase tracking-wider text-text-3">
+            Transaction Details
+          </div>
+          {receipt.rows?.map((r) => (
+            <div key={r.k} className="flex justify-between border-t border-border/50 py-2.5 text-[12.5px]">
+              <span className="text-text-3">{r.k}</span>
+              <span className={`font-semibold ${r.mono ? "mono" : ""} text-text-1`}>{r.v}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Home Button */}
+        <button
+          type="button"
+          onClick={() => {
+            flow.set({ receipt: null });
+            router.replace("/");
+          }}
+          className="mt-2 w-full rounded-xl bg-primary py-3.5 font-display text-[14px] font-bold text-white shadow-xs active:scale-[0.985] transition"
+        >
+          Go to Home
+        </button>
+      </div>
+    );
+  }
+
+  // 2. PRE-PAYMENT DETAILS VIEW (For Mobile Recharge and Billers)
   useEffect(() => {
-    if (!r) router.replace("/recharge");
-  }, [r, router]);
-  if (!r) return null;
+    if (paymentDetails) {
+      setLoadingPaymentDetails(false);
+      return undefined;
+    }
 
-  const st = STATUS[r.status];
-  const wordFix = (s) =>
-    r.mode === "bill" ? s.replace(/Recharge/g, "Payment").replace(/recharge/g, "payment") : s;
+    const activeNumber = String(flow.num || flow.account || "").replace(/\D/g, "").trim();
+    const sessionId = String(flow.session_id || flow.operatorPlanSessionId || "").trim();
+    const opId = String(flow.operator || "").trim();
+    const catType = String(flow.serviceType || flow.categoryType || "Prepaid").trim();
+    const targetAmt = Number(flow.amount || flow.billAmount || plan?.rs || plan?.amt || 0);
+
+    // Validation before fetchPaymentDetails call on ReceiptView mount
+    if (!activeNumber || !sessionId || !opId || !catType || targetAmt <= 0) {
+      setLoadingPaymentDetails(false);
+      console.warn("ReceiptView fetchPaymentDetails skipped due to incomplete transaction state:", {
+        activeNumber, sessionId, opId, catType, targetAmt
+      });
+      return undefined;
+    }
+
+    let active = true;
+
+    async function loadPaymentDetails() {
+      try {
+        setLoadingPaymentDetails(true);
+        setPaymentDetailsError("");
+        const reqPayload = {
+          amount: targetAmt,
+          session_id: sessionId,
+          operator: opId,
+          number: activeNumber,
+          type: catType,
+          circle: String(flow.circle || "14"),
+          field1: "", field2: "", field3: "", field4: "",
+          refresh: false, billDetails: "",
+          biometric_enabled: 0, is_key_active: 0,
+        };
+        console.log("ReceiptView getPaymentDetails request payload:", reqPayload);
+
+        const response = await fetchPaymentDetails(reqPayload);
+        if (active) flow.set({ paymentDetails: response, amount: targetAmt });
+      } catch (error) {
+        if (!active || error?.code === "SESSION_EXPIRED") return;
+        setPaymentDetailsError(error?.message || "Unable to load payment details. Please try again.");
+      } finally {
+        if (active) setLoadingPaymentDetails(false);
+      }
+    }
+
+    loadPaymentDetails();
+    return () => {
+      active = false;
+    };
+  }, [paymentDetails, plan, flow.num, flow.account, flow.session_id, flow.operatorPlanSessionId, flow.operator, flow.circle, flow.serviceType, flow.categoryType, flow.amount, flow.billAmount, flow.set]);
+
+  if (loadingPaymentDetails) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#f4f5fa] p-4">
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-xs">
+          <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <span className="text-[13px] font-medium text-text-2">Loading payment details...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (paymentDetailsError) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#f4f5fa] p-6 text-center">
+        <p className="text-[13px] font-medium text-text-2">{paymentDetailsError}</p>
+        <button onClick={() => router.back()} className="rounded-xl bg-primary px-4 py-3 text-[13px] font-semibold text-white">
+          Go back
+        </button>
+      </div>
+    );
+  }
+
+  const details = paymentDetails?.data ?? paymentDetails ?? {};
+  const amount = Number(details.amount ?? details.payable_amount ?? flow.billAmount ?? plan?.rs ?? plan?.amt ?? 0);
+
+  const walletBalance = Number(
+    details.wallet_balance ??
+    flow.walletBalance ??
+    flow.wallet?.balance ??
+    850
+  );
+
+  const walletAmount = useWallet ? Math.min(amount, walletBalance) : 0;
+  const payableAmount = Math.max(amount - walletAmount, 0);
+
+  const activeNum = flow.num || flow.account || details.number || "-";
+
+  // Resolve operator name, circle name, and operator logo
+  const resolved = resolveOperatorCircleInfo(
+    flow.operator || details.operator,
+    flow.circle || details.circle
+  );
+
+  const operator = flow.operatorName || details.operator_name || resolved.operatorName || (flow.serviceType || flow.categoryType || "Prepaid");
+  const circle = flow.circleName || details.circle_name || resolved.circleName || "India";
+  const logo = flow.operatorLogo || resolved.operatorLogo;
+
+  const rawBilldata = flow.billdata || {};
+  const custName = rawBilldata["Customer Name"] || flow.custName || null;
+  const subtitleText = custName ? custName : `${operator} · ${circle} · ${flow.serviceType || "Prepaid"}`;
+
+  const planAmount = Number(plan?.rs || plan?.amt || amount || 0);
+  const perDayCost = plan ? (plan.per_day_cost || (planAmount / Number(plan.validity || plan.val || 28)).toFixed(1)) : 0;
+  const dailyPrice = Number(perDayCost);
+
+  const validity = plan?.validity || plan?.val || plan?.validityDays || "-";
+  const data = plan?.data || plan?.dataBenefit || "-";
+  const calls = plan?.calls || plan?.voice || "-";
+  const sms = plan?.sms || "-";
+  const description = plan?.description || plan?.desc || "";
+  const additionalBenefits = plan?.additional_benefits || [];
+
+  // Filter non-empty billdata rows
+  const validBilldataRows = [];
+  Object.entries(rawBilldata).forEach(([k, v]) => {
+    if (v !== null && v !== undefined && String(v).trim() !== "") {
+      validBilldataRows.push({ k, v: String(v).trim() });
+    }
+  });
+
+  const handlePayment = () => {
+    console.log("Payment:", {
+      amount,
+      useWallet,
+      walletAmount,
+      payableAmount,
+      paymentDetails,
+    });
+  };
 
   return (
-    <div className="flex flex-col gap-3 p-4">
-      <div className="pt-4 text-center">
-        <span
-          className="mx-auto flex h-[74px] w-[74px] items-center justify-center rounded-full"
-          style={{ background: st.bg }}
-        >
-          <svg viewBox="0 0 24 24" className="h-9 w-9">
-            {st.icon}
-          </svg>
-        </span>
-        <div className="mt-3 font-display text-[19px] font-bold" style={{ color: st.fg }}>
-          {wordFix(st.title)}
-        </div>
-        <div className="mt-1 text-[12px] text-text-2">{wordFix(st.sub)}</div>
-        <div className="mono mt-3 text-[34px] font-semibold">Rs {inr(r.amount)}</div>
-      </div>
+    <div className="min-h-screen bg-[#f4f5fa] pb-[96px]">
+      <div className="flex flex-col gap-3 p-4">
 
-      <div className="rounded-2xl border border-border bg-surface px-4 py-1">
-        {r.rows.map((row) => (
-          <div
-            key={row.k}
-            className="flex justify-between gap-4 border-b border-border py-2.5 text-[12.5px] last:border-0"
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            aria-label="Back"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface shadow-xs transition active:scale-95"
           >
-            <span className="flex-none text-text-3">{row.k}</span>
-            <span className={`text-right font-semibold ${row.mono ? "mono font-medium" : ""}`}>
-              {row.v}
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-text-1" aria-hidden="true">
+              <path d="M15.5 4.5 8 12l7.5 7.5-1.8 1.8L4.4 12l9.3-9.3Z" />
+            </svg>
+          </button>
+          <h1 className="font-display text-[16px] font-semibold text-text-1">Payment Details</h1>
+        </div>
+
+        {/* Operator & Customer Header Card */}
+        <div className="rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-xs">
+          <div className="flex items-center gap-3">
+            {logo ? (
+              <img
+                src={logo}
+                alt={operator}
+                className="h-10 w-10 flex-none rounded-full border border-border bg-page object-cover shadow-xs"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  if (e.target.nextSibling) e.target.nextSibling.style.display = "flex";
+                }}
+              />
+            ) : null}
+            <span
+              className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-primary font-display text-[12px] font-bold text-white shadow-xs"
+              style={{ display: logo ? "none" : "flex" }}
+            >
+              {operator !== "-" ? operator.slice(0, 2).toUpperCase() : "EG"}
+            </span>
+
+            <div className="min-w-0 flex-1">
+              <div className="text-[13.5px] font-bold text-text-1">
+                <span className="mono font-semibold text-text-1">{activeNum}</span>
+              </div>
+              <div className="mt-0.5 text-[12px] font-medium text-text-3">
+                {subtitleText}
+              </div>
+            </div>
+
+            {/* SEE DETAILS / HIDE DETAILS TOGGLE BUTTON */}
+            {isBillerMode ? (
+              <button
+                type="button"
+                onClick={() => setShowCustomerCard((prev) => !prev)}
+                className="min-w-0 flex justify-center items-center cursor-pointer active:scale-95 transition"
+              >
+                <span className="text-[12.5px] text-primary font-bold">
+                  {showCustomerCard ? "Hide Details" : "See Details"}
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setDetailsSheetOpen(true)}
+                className="min-w-0 flex justify-center items-center cursor-pointer active:scale-95 transition"
+              >
+                <span className="text-[12.5px] text-primary font-bold">See Details</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Plan / Bill Amount */}
+        <div className="pt-7 text-center">
+          <div className="mono text-[42px] font-semibold leading-none text-[#111827]">
+            Rs {inr(amount)}
+          </div>
+          {dailyPrice > 0 && (
+            <div className="mt-2 text-[13px] font-medium text-text-3">
+              Rs {dailyPrice}/day
+            </div>
+          )}
+        </div>
+
+        {/* Ledger Balance Card */}
+        {details?.show_ledger === true && (
+          <div className="mt-1 flex items-center justify-between rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#e9ebff]">
+                <svg viewBox="0 0 24 24" className="h-5 w-5 fill-[#1018ff]">
+                  <path d="M20 7h-1V5a2 2 0 0 0-2-2H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V9a2 2 0 0 0-2-2ZM5 5h12v2H5a1 1 0 1 1 0-2Zm14 13H5a1 1 0 0 1-1-1V9h15v9Zm-2-3h3v-2h-3a1 1 0 0 0 0 2Z" />
+                </svg>
+              </div>
+
+              <div>
+                <div className="text-[13px] font-medium text-text-3">Available Balance</div>
+                <div className="mono mt-0.5 text-[13px] font-semibold text-text-1">Rs {details?.ledger_amount}</div>
+                <div className="text-text-3 font-small text-[12px]">{details?.message}</div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setUseWallet((prev) => !prev)}
+              aria-label="Use wallet balance"
+              className={`relative h-7 w-[47px] rounded-full transition ${
+                useWallet ? "bg-[#1018ff]" : "bg-gray-300"
+              }`}
+            >
+              <span
+                className={`absolute top-1/2 h-5 w-5 -translate-y-1/2 rounded-full bg-white shadow-sm transition ${
+                  useWallet ? "left-[25px]" : "left-[3px]"
+                }`}
+              />
+            </button>
+          </div>
+        )}
+
+        {/* BILLER CUSTOMER INFORMATION CARD (Visible ABOVE Payment Breakdown when isBillerMode and showCustomerCard is true) */}
+        {isBillerMode && showCustomerCard && validBilldataRows.length > 0 && (
+          <div className="mt-1 rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-xs">
+            <div className="flex items-center gap-2 pb-2.5 text-[13px] font-bold text-text-1 border-b border-border/40">
+              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-primary">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+              </svg>
+              Customer Information
+            </div>
+
+            {/* Key Summary Grid */}
+            <div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-3 text-[12px]">
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-text-3">Customer Name</div>
+                <div className="mt-0.5 font-bold text-text-1 truncate">
+                  {rawBilldata["Customer Name"] || custName || "-"}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-text-3">Balance</div>
+                <div className="mt-0.5 font-bold text-text-1">
+                  {rawBilldata["Balance"] !== undefined && rawBilldata["Balance"] !== "" ? rawBilldata["Balance"] : "0.00"}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-text-3">Status</div>
+                <div className="mt-0.5 font-bold text-text-1">
+                  {rawBilldata["Status"] || "Active"}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-text-3">Next Recharge Date</div>
+                <div className="mt-0.5 font-bold text-text-1">
+                  {rawBilldata["Next Recharge Date"] || rawBilldata["Due Date"] || "-"}
+                </div>
+              </div>
+            </div>
+
+            {/* Expanded Extra Fields */}
+            {expandedCustomerCard && (
+              <div className="mt-3 flex flex-col pt-2 text-[12px]">
+                {validBilldataRows
+                  .filter((r) => !["Customer Name", "Balance", "Status", "Next Recharge Date"].includes(r.k))
+                  .map((r) => (
+                    <div key={r.k} className="justify-between py-1 grid grid-cols-2 gap-y-3 gap-x-4  ">
+                      <span className="text-text-3">{r.k}</span>
+                      <span className="font-semibold text-text-1 w-[180px]">{r.v}</span>
+                    </div>
+                  ))}
+              </div>
+            )}
+
+            {/* See More / See Less Toggle Link */}
+            <div className="mt-3 text-center border-t border-border/40 pt-2">
+              <button
+                type="button"
+                onClick={() => setExpandedCustomerCard((prev) => !prev)}
+                className="text-[12px] font-bold text-primary active:scale-95 transition"
+              >
+                {expandedCustomerCard ? "See less" : "See more"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* FULL PAYMENT SUMMARY CARD (Payment Breakdown) */}
+        <div className="mt-1 rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-xs">
+          <div className="mb-2 text-[12px] font-bold uppercase tracking-wider text-text-3">
+            Payment Breakdown
+          </div>
+
+          <div className="flex items-center justify-between py-1.5 text-[13px]">
+            <span className="text-text-3">Recharge amount</span>
+            <span className="mono font-medium text-text-1">Rs {inr(amount)}</span>
+          </div>
+
+          {useWallet && (
+            <div className="flex items-center justify-between py-1.5 text-[13px]">
+              <span className="text-text-3">Paid from wallet</span>
+              <span className="mono font-medium text-text-1">Rs {inr(walletAmount)}</span>
+            </div>
+          )}
+
+          {/* Convenience Charge Fee (CCF) */}
+          <div className="flex items-center justify-between py-1.5 text-[13px]">
+            <span className="text-text-3">{details?.ccf_title || "Convenience fee"}</span>
+            {Number(details?.ccf) > 0 ? (
+              <div className="flex items-center gap-1.5">
+                <span className="mono font-medium text-text-1">Rs {details?.ccf}</span>
+                {details?.ccf_msg && (
+                  <div className="group relative">
+                    <span className="flex h-3.5 w-3.5 cursor-pointer items-center justify-center rounded-full border border-text-3 text-[10px] font-bold text-text-3">
+                      i
+                    </span>
+                    <div className="pointer-events-none absolute bottom-full right-0 z-50 mb-2 hidden w-52 rounded-lg bg-gray-700 px-3 py-2 text-[11px] leading-relaxed text-white shadow-lg group-hover:block">
+                      {details?.ccf_msg}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <span className="font-medium text-green-600">Free</span>
+            )}
+          </div>
+
+          {/* Cashback discount */}
+          {details?.cashback_discount && (
+            <div className="flex items-center justify-between py-1.5 text-[13px]">
+              <span className="text-text-3">Cashback discount</span>
+              <span className="mono font-medium text-text-1">Rs {details?.cashback_discount}</span>
+            </div>
+          )}
+
+          {!useWallet && (
+            <div className="flex items-center justify-between py-1.5 text-[13px]">
+              <span className="text-text-3">Amount to add</span>
+              <span className="mono font-medium text-red-500">Rs {inr(amount)}</span>
+            </div>
+          )}
+
+          <div className="my-1 border-t border-dashed border-border" />
+
+          <div className="flex items-center justify-between py-1.5">
+            <span className="text-[13.5px] font-bold text-text-1">
+              {useWallet ? "Total from wallet" : "Total payable"}
+            </span>
+            <span className="mono text-[14px] font-bold text-text-1">
+              Rs {inr(details?.total_payable || amount)}
             </span>
           </div>
-        ))}
+        </div>
+
       </div>
 
-      <div
-        className="flex gap-2 rounded-xl px-3.5 py-3 text-[11.5px] font-medium leading-relaxed"
-        style={{ background: st.bg, color: st.fg }}
-      >
-        <svg viewBox="0 0 24 24" className="mt-0.5 h-[15px] w-[15px] flex-none" style={{ fill: st.fg }}>
-          <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 15h-2v-6h2Zm0-8h-2V7h2Z" />
-        </svg>
-        {wordFix(st.note)}
-      </div>
-
-      <div className="flex gap-2.5">
+      {/* Bottom Payment Button */}
+      <div className="flex items-center justify-center bg-surface fixed bottom-0 w-full p-3 border-t border-border">
         <button
-          onClick={() => toast("Opens share sheet with receipt image")}
-          className="flex-1 rounded-xl border-[1.5px] border-border bg-surface py-3 font-display text-[13px] font-semibold"
+          type="button"
+          onClick={handlePayment}
+          className="flex items-center w-full justify-center gap-2 rounded-xl bg-[#1018ff] py-4 font-display text-[16px] font-bold text-white shadow-sm transition active:scale-[0.99]"
         >
-          Share Receipt
+          <span>Proceed to pay</span>
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </span>
         </button>
-        {r.retryHref && (
-          <Link
-            href={r.retryHref}
-            className="flex-1 rounded-xl border-[1.5px] border-border bg-surface py-3 text-center font-display text-[13px] font-semibold"
-          >
-            Try Again
-          </Link>
-        )}
-        <Link
-          href="/"
-          onClick={() => flow.reset()}
-          className="flex-1 rounded-xl bg-primary py-3 text-center font-display text-[13px] font-semibold text-white"
-        >
-          Done
-        </Link>
       </div>
+
+      {/* MOBILE PLAN BENEFITS SHEET MODAL ON "SEE DETAILS" CLICK (ONLY FOR MOBILE RECHARGE) */}
+      {!isBillerMode && (
+        <Sheet open={detailsSheetOpen} onClose={() => setDetailsSheetOpen(false)}>
+          <div className="flex max-h-[50vh] flex-col overflow-hidden">
+            <div className="flex flex-none items-center justify-between pb-3 border-b border-border/40">
+              <span className="mono font-display text-[26px] font-extrabold text-text-1">
+                Rs {inr(planAmount)}
+              </span>
+              {dailyPrice > 0 && (
+                <span className="rounded-full bg-primary-soft px-3 py-1 text-[12px] font-bold text-primary">
+                  Rs {dailyPrice}/day
+                </span>
+              )}
+            </div>
+
+            {/* Scrollable Content Container */}
+            <div className="flex-1 overflow-y-auto min-h-0 no-scrollbar py-3.5 flex flex-col gap-4">
+              <div className="grid grid-cols-4 divide-x divide-border rounded-xl bg-page/50 py-2.5 text-center">
+                <div className="px-1 min-w-0">
+                  <div className="text-[10px] leading-tight break-words min-h-[24px] font-extrabold text-text-1">{calls}</div>
+                  <div className="mt-0.5 text-[10.5px] font-medium text-text-3">Calls</div>
+                </div>
+                <div className="px-1 min-w-0">
+                  <div className="break-words min-h-[24px] text-[10px] leading-tight font-extrabold text-text-1">{sms}</div>
+                  <div className="mt-0.5 text-[10.5px] font-medium text-text-3">SMS</div>
+                </div>
+                <div className="px-1 min-w-0">
+                  <div className="text-[10px] font-extrabold text-text-1 break-words leading-tight min-h-[24px]">{data}</div>
+                  <div className="mt-0.5 text-[10.5px] font-medium text-text-3">Data</div>
+                </div>
+                <div className="px-1 min-w-0">
+                  <div className="text-[10px] font-extrabold text-text-1 break-words leading-tight min-h-[24px]">{validity}</div>
+                  <div className="mt-0.5 text-[10.5px] font-medium text-text-3">Validity</div>
+                </div>
+              </div>
+
+              {description && (
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-text-3">Description</div>
+                  <p className="mt-1.5 text-[12.5px] leading-relaxed text-text-2 whitespace-pre-line">{description}</p>
+                </div>
+              )}
+
+              {additionalBenefits.length > 0 && (
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-text-3">Additional Benefits</div>
+                  <div className="mt-2 flex flex-col divide-y divide-border">
+                    {additionalBenefits.map((b, bIdx) => (
+                      <div key={bIdx} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
+                        <BenefitAvatar item={b} index={bIdx} />
+                        <div className="min-w-0 flex-1">
+                          <span className="block text-[13px] font-bold text-text-1">{b.title}</span>
+                          {b.description && (
+                            <span className="block text-[11.5px] font-medium text-text-3">{b.description}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </Sheet>
+      )}
     </div>
   );
 }

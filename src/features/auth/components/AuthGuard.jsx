@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/auth/store";
+import { useSessionExpiryStore } from "@/lib/auth/sessionExpiryStore";
 
 export function AuthGuard({ children }) {
   const hydrated = useAuthStore((s) => s.hydrated);
   const token = useAuthStore((s) => s.token);
+  const sessionExpired = useSessionExpiryStore((s) => s.expired);
   const router = useRouter();
   const [showLogin, setShowLogin] = useState(false);
 
@@ -22,6 +24,10 @@ export function AuthGuard({ children }) {
       </div>
     );
   }
+
+  // Keep the current screen visible behind the global, blocking expiry modal.
+  // The overlay makes it inert, so no expired-screen action can be used.
+  if (sessionExpired) return <>{children}</>;
 
   if (!token || showLogin) {
     return (

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { ServiceGrid } from "@/features/home/ServiceGrid";
 import { useDashboard } from "@/features/dashboard/hooks/useDashboard";
-import Link from "next/link";
+import { BottomBannerSheet } from "@/features/home/components/BottomBannerSheet";
 
 export default function HomePage() {
   const { data: dashboardData, isLoading } = useDashboard();
@@ -70,22 +70,10 @@ export default function HomePage() {
       ) : null}
 
       {/* KYC banner */}
-      {/* <Link
-        href="/kyc"
-        className="flex items-center gap-3 rounded-2xl border-[1.5px] border-orange bg-orange-soft px-4 py-3"
-      >
-        <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-orange">
-          <svg viewBox="0 0 24 24" className="h-[18px] w-[18px] fill-white">
-            <path d="M12 2 1.5 20.5h21Zm1.1 13.6h-2.2v-5h2.2Zm0 3.4h-2.2v-2.2h2.2Z" />
-          </svg>
-        </span>
-        <span className="flex-1 text-[12px] font-medium text-text-2">
-          Complete your KYC to unlock AEPS and Money Transfer
-        </span>
-        <span className="text-[12px] font-bold text-orange">Continue</span>
-      </Link> */}
+     
 
       <ServiceGrid />
+      <BottomBannerSheet/>
     </div>
   );
 }

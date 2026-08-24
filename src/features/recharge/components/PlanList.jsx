@@ -26,7 +26,7 @@ function Benefits({ p }) {
 }
 
 function OttMinis({ p }) {
-  if (!p.ott.length) return <span />;
+  if (!p?.ott?.length) return <span />;
   return (
     <span className="flex items-center">
       {p.ott.map((o, i) => (
@@ -52,12 +52,32 @@ export function PlanList() {
   const [q, setQ] = useState("");
   const [sheetPlan, setSheetPlan] = useState(null);
 
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const planData = flow.operatorPlanData;
+
+  // Dynamic promo sliders banner from 
+  const sliderData = planData?.sliders;
+  const styles = sliderData?.styles || {};
+  const slidePath = sliderData?.slide_path || "https://blr1.digitaloceanspaces.com/egpaymentuhfivgruiaslasfmiaronoa/collection/storage/";
+  const sliders = sliderData?.sliders || [];
+  const currentSlide = sliders[currentSlideIndex];
+
+  const handleSlideClick = () => {
+    if (!currentSlide?.redirect_url && !currentSlide?.url) return;
+    router.push(currentSlide.redirect_url || currentSlide.url);
+  };
+
   const searching = q.trim().length > 0;
   const qDigits = /^\d+$/.test(q.trim()) ? parseInt(q.trim(), 10) : 0;
   const amountMode = qDigits >= 10;
 
+  const rawPlans = useMemo(() => {
+    if (planData?.plans && Array.isArray(planData.plans)) return planData.plans;
+    return PLANS;
+  }, [planData]);
+
   const { plans, showCustom } = useMemo(() => {
-    let list = PLANS.filter((p) => searching || p.cat === PLAN_CATS[cat]);
+    let list = rawPlans.filter((p) => searching || p.cat === PLAN_CATS[cat]);
     let custom = false;
     if (searching) {
       if (amountMode) {
@@ -70,14 +90,14 @@ export function PlanList() {
       } else {
         const needle = q.trim().toLowerCase();
         list = list.filter((p) =>
-          `${p.amt} ${p.val} ${p.calls} ${p.sms} ${p.data} ${p.cat} ${p.desc} ${p.full} ${p.ott.map((o) => o.n).join(" ")}`
+          `${p.amt} ${p.val} ${p.calls} ${p.sms} ${p.data} ${p.cat} ${p.desc} ${p.full} ${p.ott?.map((o) => o.n).join(" ") || ""}`
             .toLowerCase()
             .includes(needle),
         );
       }
     }
     return { plans: list, showCustom: custom };
-  }, [q, cat, searching, amountMode, qDigits]);
+  }, [q, cat, searching, amountMode, qDigits, rawPlans]);
 
   function select(plan, customAmt) {
     flow.set({ plan, customAmt });
@@ -85,8 +105,51 @@ export function PlanList() {
   }
 
   return (
-    <div className="mt-4">
-      <div className="flex items-center gap-2 rounded-xl border-[1.5px] border-border bg-surface px-3.5 py-2.5 focus-within:border-primary">
+    <div className="mt-4 flex flex-col gap-3">
+      {/* Dynamic Top Slider Banner from  */}
+      {currentSlide && (
+        <div
+          className="group relative cursor-pointer overflow-hidden"
+          onClick={handleSlideClick}
+          style={{
+            margin: styles?.padding !== undefined ? `${styles.padding}px` : undefined,
+          }}
+        >
+          <div
+            className="relative w-full overflow-hidden"
+            style={{
+              height: styles?.height !== undefined ? `${styles.height}px` : undefined,
+              borderRadius: styles?.cornerRadius !== undefined ? `${styles.cornerRadius}px` : "11px",
+            }}
+          >
+            <img
+              src={currentSlide.image ? `${slidePath}${currentSlide.image}` : `${slidePath}${currentSlide.image_url}`}
+              alt="Recharge Offer"
+              className="h-full w-full object-cover object-top transition-transform duration-300"
+            />
+
+            {sliders.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2">
+                {sliders.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentSlideIndex(idx);
+                    }}
+                    className={`h-2 w-2 rounded-full transition ${
+                      idx === currentSlideIndex ? "bg-white" : "bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Search plans input */}
+      <div className="flex items-center gap-2 rounded-xl border-[1.5px] border-border bg-surface px-3.5 py-2.5 focus-within:border-primary shadow-xs">
         <svg viewBox="0 0 24 24" className="h-4 w-4 flex-none fill-text-3">
           <path d="M15.5 14h-.8l-.3-.3a6.5 6.5 0 1 0-.7.7l.3.3v.8l5 5 1.5-1.5Zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14Z" />
         </svg>
@@ -98,16 +161,17 @@ export function PlanList() {
         />
       </div>
 
+      {/* Category Tabs */}
       {!searching && (
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
           {PLAN_CATS.map((c, i) => (
             <button
               key={c}
               onClick={() => setCat(i)}
-              className={`flex-none rounded-full border-[1.5px] px-3.5 py-1.5 text-[11.5px] font-semibold ${
+              className={`flex-none rounded-full border-[1.5px] px-3.5 py-1.5 text-[11.5px] font-semibold transition ${
                 i === cat
-                  ? "border-primary bg-primary-soft text-primary"
-                  : "border-border bg-page text-text-2"
+                  ? "border-primary bg-primary-soft text-primary shadow-xs"
+                  : "border-border bg-page text-text-2 hover:bg-surface"
               }`}
             >
               {c}
@@ -116,7 +180,8 @@ export function PlanList() {
         </div>
       )}
 
-      <div className="mt-3 flex flex-col gap-2.5">
+      {/* Plans List */}
+      <div className="flex flex-col gap-2.5">
         {showCustom && (
           <button
             onClick={() => select(null, qDigits)}
@@ -139,11 +204,11 @@ export function PlanList() {
           </button>
         )}
 
-        {plans.map((p) => (
+        {plans.map((p, idx) => (
           <button
-            key={p.amt + p.cat}
+            key={idx}
             onClick={() => select(p, null)}
-            className="rounded-2xl border border-border bg-surface p-3.5 text-left active:scale-[0.985]"
+            className="rounded-2xl border border-border bg-surface p-3.5 text-left active:scale-[0.985] shadow-xs"
           >
             <div className="flex items-center">
               <span className="mono text-[17px] font-semibold">Rs {inr(p.amt)}</span>
@@ -206,7 +271,7 @@ export function PlanList() {
             </div>
             <div className="mt-4 text-[11px] font-bold uppercase tracking-wider text-text-3">Description</div>
             <p className="mt-1.5 text-[12.5px] leading-relaxed text-text-2">{sheetPlan.full}</p>
-            {sheetPlan.ott.length > 0 && (
+            {sheetPlan.ott && sheetPlan.ott.length > 0 && (
               <>
                 <div className="mt-4 text-[11px] font-bold uppercase tracking-wider text-text-3">
                   Additional benefits

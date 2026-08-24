@@ -1,4 +1,5 @@
 import { inr } from "@/utils/format";
+import Cookies from "js-cookie";
 
 export { inr };
 
@@ -11,17 +12,16 @@ export const OPERATORS = [
 
 export const CIRCLES = ["Rajasthan", "Delhi NCR", "UP West", "Mumbai", "Gujarat", "Punjab"];
 
+export const STATIC_CONTACTS = [
+  { name: "+919826585274", num: "9826585274", tag: "contact", color: "#F07800" },
+  { name: "ARV", num: "9257475779", tag: "contact", color: "#00A389" },
+  { name: "Aanand Colony", num: "6263471067", tag: "contact", color: "#E40000" },
+  { name: "Aanand Yadav", num: "9981223344", tag: "contact", color: "#008540" },
+];
+
 export const SUGGESTS = [
-  { name: "My Number", num: "9821249876", tag: "self", color: "var(--primary)" },
-  { name: "Suresh Ji", num: "9887012345", tag: "recent", color: "#00A389" },
-  { name: "Meena Devi", num: "7014455667", tag: "recent", color: "#F07800" },
-  { name: "Arjun Mobile", num: "9636998877", tag: "recent", color: "#7B2FBE" },
-  { name: "Kamla Aunty", num: "8890334455", tag: "recent", color: "#E40000" },
-  { name: "Vikas Bhai", num: "9772211334", tag: "recent", color: "#0A2885" },
-  { name: "Anita Sharma", num: "9414223311", tag: "contact", color: "#B4128F" },
-  { name: "Deepak Electric", num: "8003445566", tag: "contact", color: "#008540" },
-  { name: "Pooja Didi", num: "9950667788", tag: "contact", color: "#B5790E" },
-  { name: "Ramesh Dairy", num: "7737889900", tag: "contact", color: "#1A5C9E" },
+  { name: "My Number", num: "9926452120", tag: "self", color: "var(--primary)" },
+  ...STATIC_CONTACTS,
 ];
 
 const CINE = { n: "CinePlay Mobile", ic: "C", c: "#D81F26", d: "Mobile-only subscription, plan validity" };
@@ -40,7 +40,7 @@ export const PLANS = [
   { amt: 49, val: "Existing", calls: "Talktime Rs 38", sms: "-", data: "100MB", cat: "Talktime", desc: "Small top-up pack.", full: "Rs 38.52 talktime plus 100MB data. Unlimited validity with active plan.", ott: [] },
 ];
 
-export const PLAN_CATS = ["Popular", "Data", "Unlimited", "Talktime"];
+export const PLAN_CATS = ["Popular", "Data", "Unlimited", "Talktime",];
 
 export function perDay(p) {
   const m = /^(\d+)\s*days?$/.exec(p.val);
@@ -50,9 +50,55 @@ export function perDay(p) {
 }
 
 export function fmtNum(n) {
-  return `${n.slice(0, 5)} ${n.slice(5)}`;
+  if (!n) return "";
+  const clean = String(n).replace(/\D/g, "");
+  if (clean.length === 10) {
+    return `${clean.slice(0, 5)} ${clean.slice(5)}`;
+  }
+  return n;
 }
 
 export function detectOperator(num) {
   return OPERATORS[parseInt(num[0], 10) % 4];
+}
+
+/**
+ * Dynamically extract logged-in merchant mobile number from session or cookies
+ */
+export function getMerchantMobile() {
+  if (typeof window !== "undefined") {
+    try {
+      const cached = sessionStorage.getItem("dashboard_data_session");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        const mobile = parsed?.user?.mobile || parsed?.mobile || parsed?.authMobile;
+        if (mobile) return String(mobile);
+      }
+    } catch {}
+  }
+  const cookieMobile = Cookies.get("authMobile");
+  if (cookieMobile) return String(cookieMobile);
+  return "9926452120"; // Fallback default
+}
+
+/**
+ * Format Unix timestamp or date string to "14 Aug 2026"
+ */
+export function formatRechargeDate(ts) {
+  if (!ts) return "";
+  let dateObj;
+  if (typeof ts === "number") {
+    dateObj = new Date(ts > 1e11 ? ts : ts * 1000);
+  } else {
+    dateObj = new Date(ts);
+  }
+
+  if (isNaN(dateObj.getTime())) return "";
+
+  const day = dateObj.getDate();
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = monthNames[dateObj.getMonth()];
+  const year = dateObj.getFullYear();
+
+  return `${day} ${month} ${year}`;
 }
