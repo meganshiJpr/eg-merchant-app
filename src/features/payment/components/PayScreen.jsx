@@ -35,8 +35,21 @@ export function PayScreen() {
   const toast = useToast((t) => t.show);
   const setReceipt = useRecharge((s) => s.set);
 
+  const initialResolvedAmount = 
+    Number(flow.amount) > 0
+      ? Number(flow.amount)
+      : (Number(req?.amount) > 0
+          ? Number(req.amount)
+          : (Number(req?.billAmount) > 0
+              ? Number(req.billAmount)
+              : (Number(flow.billAmount) > 0
+                  ? Number(flow.billAmount)
+                  : 0)));
+
   const [useWalletBal, setUseWalletBal] = useState(true);
-  const [amountStr, setAmountStr] = useState("");
+  const [amountStr, setAmountStr] = useState(() => {
+    return initialResolvedAmount > 0 ? `Rs ${inr(initialResolvedAmount)}` : "";
+  });
   const [upiOpen, setUpiOpen] = useState(false);
   const [upiStatus, setUpiStatus] = useState("");
   const [mpinOpen, setMpinOpen] = useState(false);
@@ -55,7 +68,7 @@ export function PayScreen() {
     );
 
     if (selectedAmount > 0) {
-      setAmountStr(String(selectedAmount));
+      setAmountStr(`Rs ${inr(selectedAmount)}`);
       setReceipt({
         amount: selectedAmount,
         billAmount: selectedAmount,
@@ -66,13 +79,21 @@ export function PayScreen() {
   };
 
   useEffect(() => {
-    if (!req) {
+    const flowState = useRecharge.getState();
+    const hasValidFlow = Boolean(req || flowState.num || flowState.operator || flow.num);
+    if (!hasValidFlow) {
       router.replace("/");
       return;
     }
-    setUseWalletBal(req.walletAllowed);
-    setAmountStr(req.amount ? `Rs ${inr(req.amount)}` : "");
-  }, [req, router]);
+    if (req) {
+      setUseWalletBal(req.walletAllowed);
+    }
+
+    const activeAmount = Number(flowState.amount || flow.amount || req?.amount || initialResolvedAmount);
+    if (activeAmount > 0) {
+      setAmountStr(`Rs ${inr(activeAmount)}`);
+    }
+  }, [req, router, flow.num, flow.amount]);
 
   const amount = useMemo(() => {
     if (!req) return 0;
@@ -83,7 +104,6 @@ export function PayScreen() {
 
   if (!req) return null;
 
-  console.log("request reponse",req)
 
   const amtOk = req.editableAmount ? amount >= req.amin && amount <= req.amax : amount > 0;
   const walletUsable = useWalletBal && req.walletAllowed ? wallet.balance : 0;
@@ -94,7 +114,11 @@ export function PayScreen() {
 
   function onAmt(v) {
     const digits = v.replace(/[^0-9]/g, "");
-    setAmountStr(digits ? `Rs ${inr(parseInt(digits, 10))}` : "");
+    const parsedVal = digits ? parseInt(digits, 10) : 0;
+    setAmountStr(digits ? `Rs ${inr(parsedVal)}` : "");
+    if (parsedVal > 0) {
+      useRecharge.getState().set({ amount: parsedVal });
+    }
   }
 
   function finish(status, via, walletDebit) {
@@ -129,6 +153,8 @@ export function PayScreen() {
     }, 1200);
   }
 
+  // console.log("request from the operator",req)
+
   const btnLabel = !amtOk
     ? `Enter Rs ${inr(req.amin)} – ${inr(req.amax)}`
     : short > 0
@@ -162,10 +188,10 @@ export function PayScreen() {
           {req.avatar?.text}
         </span>
         <div className="min-w-0 flex-1">
-          <div className="text-[13.5px] font-bold text-text-1">{req.custName}</div>
+          <div className="text-[13.5px] font-bold text-text-1">{req.custName ? req.custName: req.line1}</div>
           <div className="flex gap-1">
-            <span className="text-[11.5px] font-medium text-text-3">{req.account} •</span>
-          <div className="text-[11.5px] font-medium text-text-3">{req.line1}</div>
+            <span className="text-[11.5px] font-medium text-text-3">{req.account} </span>
+          <div className="text-[11.5px] font-medium text-text-3 min-w-0 truncate">{req.custName?req.line1 : ""}</div>
           </div>
         </div>
       </div>
@@ -185,9 +211,9 @@ export function PayScreen() {
         )}
 
         {/* HORIZONTAL AMOUNT RECOMMENDATION CHIPS (SLABS) */}
-        {req.slabs && req.slabs.length > 0 && (
+        {((req.slabs && req.slabs.length > 0) || (flow.slabs && flow.slabs.length > 0)) && (
           <div className="mt-3.5 flex items-center justify-center gap-2 overflow-x-auto no-scrollbar py-1">
-            {req.slabs.map((slabVal) => (
+            {((req.slabs && req.slabs.length > 0) ? req.slabs : flow.slabs).map((slabVal) => (
               <button
                 key={slabVal}
                 type="button"
@@ -251,9 +277,9 @@ export function PayScreen() {
           {req.fetched.rows
             .filter((r) => r.v !== null && r.v !== undefined && String(r.v).trim() !== "")
             .map((r) => (
-              <div key={r.k} className="flex justify-between border-t border-border py-2.5 text-[12.5px]">
-                <span className="text-text-3">{r.k}</span>
-                <span className="font-semibold text-text-1">{r.v}</span>
+              <div key={r.k} className="flex justify-between  border-t border-border py-2.5 text-[12.5px]">
+                <span className="text-text-3 w-1/2">{r.k}</span>
+                <span className="font-semibold text-text-1 text-right">{r.v}</span>
               </div>
             ))}
         </div>
@@ -267,7 +293,7 @@ export function PayScreen() {
             if (req.mode === "bill") {
               const finalAmount = Number(amount);
               const sessionId = String(flow.session_id || req.session_id || "").trim();
-              const activeNum = String(flow.num || req.account || "").replace(/\D/g, "").trim();
+              const activeNum = String(flow.num || req.account || "").trim();
               const opId = String(flow.operator || req.opId || "38").trim();
               const catType = String(flow.serviceType || req.categoryType || "DTH").trim();
 
@@ -311,7 +337,7 @@ export function PayScreen() {
                   refresh: false, billDetails: "",
                   biometric_enabled: 0, is_key_active: 0,
                 };
-                console.log("Triggering fetchPaymentDetails API:", reqPayload);
+                console.log("Triggering fetchPaymentDetails API Payload:", reqPayload);
 
                 const response = await fetchPaymentDetails(reqPayload);
 
@@ -345,7 +371,7 @@ export function PayScreen() {
               <span>Fetching payment details...</span>
             </>
           ) : (
-            <span>Proceed to Pay</span>
+            <span>{btnLabel}</span>
           )}
         </button>
       </div>

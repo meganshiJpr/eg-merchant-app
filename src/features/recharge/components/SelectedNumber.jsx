@@ -36,8 +36,20 @@ export function SelectedNumber({ num, name, onEdit, onChangeOperatorCircle }) {
 
   // Filter Prepaid Operators ONLY from session contractor_list_session
   const prepaidOps = useMemo(() => {
-    const rawOps = sessionData?.operators?.all || (Array.isArray(sessionData) ? sessionData : []);
-    if (!Array.isArray(rawOps)) return [];
+    const allOps =
+      sessionData?.operators?.all ||
+      sessionData?.data?.operators?.all ||
+      sessionData?.operators ||
+      sessionData?.data?.operators;
+
+    const rawOps = Array.isArray(allOps)
+      ? allOps
+      : allOps && typeof allOps === "object"
+        ? Object.values(allOps)
+        : Array.isArray(sessionData)
+          ? sessionData
+          : [];
+
     return rawOps.filter((op) => !op.type || op.type === "Prepaid");
   }, [sessionData]);
 
@@ -165,7 +177,7 @@ export function SelectedNumber({ num, name, onEdit, onChangeOperatorCircle }) {
 
             {/* Subtitle Row: Operator • Circle • Type */}
             <div className="text-[12px] text-text-3">
-              {opName} • {stateName} • {opType}
+              {opName} • {stateName} 
             </div>
           </div>
         </div>

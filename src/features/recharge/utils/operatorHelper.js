@@ -14,7 +14,19 @@ function getSessionOperatorsData() {
  */
 export function resolveOperatorCircleInfo(opIdInput, circleIdInput) {
   const sessionData = getSessionOperatorsData();
-  const rawOps = sessionData?.operators?.all || (Array.isArray(sessionData) ? sessionData : []);
+  const allOps =
+    sessionData?.operators?.all ||
+    sessionData?.data?.operators?.all ||
+    sessionData?.operators ||
+    sessionData?.data?.operators;
+
+  const rawOps = Array.isArray(allOps)
+    ? allOps
+    : allOps && typeof allOps === "object"
+      ? Object.values(allOps)
+      : Array.isArray(sessionData)
+        ? sessionData
+        : [];
   const rawCircles = sessionData?.circles || sessionData?.operators?.circles || sessionData?.states || [];
   const basePath = sessionData?.operator_img || "https://staging.paybyapis.com/images/operators/";
 

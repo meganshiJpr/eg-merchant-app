@@ -79,7 +79,7 @@ export function ReceiptView() {
     }
 
     return (
-      <div className="min-h-screen bg-[#f4f5fa] pb-12 p-4 flex flex-col gap-4">
+      <div className="min-h-screen bg-[#f4f5fa] pb-24 p-4 flex flex-col gap-4">
         {/* Status Header Banner */}
         <div className="flex flex-col items-center justify-center pt-6 text-center">
           <span
@@ -266,23 +266,24 @@ export function ReceiptView() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f5fa] pb-[96px]">
+    <div className="flex min-h-screen flex-col bg-[#f4f5fa] pb-24 text-text-1">
+      {/* FIXED HEADER */}
+      <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-surface px-4 py-3 shadow-2xs">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          aria-label="Back"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface shadow-2xs transition active:scale-95"
+        >
+          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-text-1" aria-hidden="true">
+            <path d="M15.5 4.5 8 12l7.5 7.5-1.8 1.8L4.4 12l9.3-9.3Z" />
+          </svg>
+        </button>
+        <h1 className="font-display text-[16px] font-semibold text-text-1">Payment Details</h1>
+      </div>
+
+      {/* MIDDLE SCROLLABLE CONTENT */}
       <div className="flex flex-col gap-3 p-4">
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            aria-label="Back"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface shadow-xs transition active:scale-95"
-          >
-            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-text-1" aria-hidden="true">
-              <path d="M15.5 4.5 8 12l7.5 7.5-1.8 1.8L4.4 12l9.3-9.3Z" />
-            </svg>
-          </button>
-          <h1 className="font-display text-[16px] font-semibold text-text-1">Payment Details</h1>
-        </div>
-
         {/* Operator & Customer Header Card */}
         <div className="rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-xs">
           <div className="flex items-center gap-3">
@@ -305,11 +306,12 @@ export function ReceiptView() {
             </span>
 
             <div className="min-w-0 flex-1">
-              <div className="text-[13.5px] font-bold text-text-1">
-                <span className="mono font-semibold text-text-1">{activeNum}</span>
+               <div className="mt-0.5 text-[13.5px] font-bold text-text-1">
+                {subtitleText ? subtitleText : operator}
               </div>
-              <div className="mt-0.5 text-[12px] font-medium text-text-3">
-                {subtitleText}
+              <div className="text-[11.5px] font-medium text-text-3">
+                <span className="">{activeNum } </span>
+                <span className=" "> {subtitleText? "":operator}</span>
               </div>
             </div>
 
@@ -392,61 +394,40 @@ export function ReceiptView() {
               Customer Information
             </div>
 
-            {/* Key Summary Grid */}
+            {/* Key Summary 2x2 Grid for first 4 entries */}
             <div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-3 text-[12px]">
-              <div>
-                <div className="text-[10px] font-bold uppercase tracking-wider text-text-3">Customer Name</div>
-                <div className="mt-0.5 font-bold text-text-1 truncate">
-                  {rawBilldata["Customer Name"] || custName || "-"}
+              {validBilldataRows.slice(0, 4).map((r) => (
+                <div key={r.k} className="min-w-0">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-text-3 truncate">{r.k}</div>
+                  <div className="mt-0.5 font-bold text-text-1 truncate">{r.v}</div>
                 </div>
-              </div>
-
-              <div>
-                <div className="text-[10px] font-bold uppercase tracking-wider text-text-3">Balance</div>
-                <div className="mt-0.5 font-bold text-text-1">
-                  {rawBilldata["Balance"] !== undefined && rawBilldata["Balance"] !== "" ? rawBilldata["Balance"] : "0.00"}
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[10px] font-bold uppercase tracking-wider text-text-3">Status</div>
-                <div className="mt-0.5 font-bold text-text-1">
-                  {rawBilldata["Status"] || "Active"}
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[10px] font-bold uppercase tracking-wider text-text-3">Next Recharge Date</div>
-                <div className="mt-0.5 font-bold text-text-1">
-                  {rawBilldata["Next Recharge Date"] || rawBilldata["Due Date"] || "-"}
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Expanded Extra Fields */}
-            {expandedCustomerCard && (
-              <div className="mt-3 flex flex-col pt-2 text-[12px]">
-                {validBilldataRows
-                  .filter((r) => !["Customer Name", "Balance", "Status", "Next Recharge Date"].includes(r.k))
-                  .map((r) => (
-                    <div key={r.k} className="justify-between py-1 grid grid-cols-2 gap-y-3 gap-x-4  ">
-                      <span className="text-text-3">{r.k}</span>
-                      <span className="font-semibold text-text-1 w-[180px]">{r.v}</span>
-                    </div>
-                  ))}
+            {expandedCustomerCard && validBilldataRows.length > 4 && (
+              <div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-3 text-[12px]">
+                {validBilldataRows.slice(4).map((r) => (
+                  <div key={r.k} className="min-w-0">
+                    <div className="text-text-3">{r.k}</div>
+                    <div className="font-semibold text-text-1 ">{r.v}</div>
+                  </div>
+                ))}
               </div>
             )}
 
-            {/* See More / See Less Toggle Link */}
-            <div className="mt-3 text-center border-t border-border/40 pt-2">
-              <button
-                type="button"
-                onClick={() => setExpandedCustomerCard((prev) => !prev)}
-                className="text-[12px] font-bold text-primary active:scale-95 transition"
-              >
-                {expandedCustomerCard ? "See less" : "See more"}
-              </button>
-            </div>
+            {/* See More / See Less Toggle Link (Only if > 4 items) */}
+            {validBilldataRows.length > 4 && (
+              <div className="mt-3 text-center border-t border-border/40 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setExpandedCustomerCard((prev) => !prev)}
+                  className="text-[12px] font-bold text-primary active:scale-95 transition"
+                >
+                  {expandedCustomerCard ? "See less" : "See more"}
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -516,11 +497,10 @@ export function ReceiptView() {
             </span>
           </div>
         </div>
-
       </div>
 
       {/* Bottom Payment Button */}
-      <div className="flex items-center justify-center bg-surface fixed bottom-0 w-full p-3 border-t border-border">
+      <div className="fixed inset-x-0 bottom-0 z-30 mx-auto max-w-app border-t border-border bg-surface p-3 shadow-lg">
         <button
           type="button"
           onClick={handlePayment}

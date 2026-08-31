@@ -114,7 +114,34 @@ export async function fetchBillOperatorDetails({operator}){
     throw error;
   }
 }
+
+
+export async function fetchOperatorBillInfo({number,operator,field1,type,field2,field3,field4}){
+  try {
+    const data = await apish("fetchBillInfo",{
+      number,
+      operator:String(operator),
+      field1,
+      type,
+      field2,
+      field3,
+      field4,
+    });
+    const parsed = typeof data === "string" ? JSON.parse(data) : data;
+    console.log("Fetch response of the other bills services",parsed);
+
+    return parsed;
+  } catch (error) {
+    if (error?.data && typeof error.data === "object" && ("success" in error.data || "message" in error.data)) {
+      console.log("fetchOperatorBillInfo caught ApiError payload as valid business response:", error.data);
+      return error.data;
+    }
+    console.error("fetchotherbillInfo Error:", error);
+    throw error;
+  }
+}
+
 if (typeof window !== "undefined") {
-  window.fetchBillOperatorDetails = fetchBillOperatorDetails;
+  window.fetchOperatorBillInfo = fetchOperatorBillInfo;
 }
 

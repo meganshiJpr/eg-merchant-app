@@ -1,3 +1,5 @@
+import { title } from "process";
+
 export const BUTTON_LABEL = {
   fetch: "Fetch Bill",
   info: "Get Customer Info",
@@ -21,7 +23,9 @@ export const BILLERS = [
   },
   {
     title: "FASTag Recharge", amin: 100, amax: 10000,
- 
+  },
+  {
+    title: "Subscription", amin: 100, amax: 10000,
   },
 ];
 

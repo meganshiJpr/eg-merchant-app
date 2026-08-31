@@ -15,19 +15,22 @@ export default function BillPayPage() {
   const flow = useRecharge();
   const setReq = usePay((s) => s.set);
 
-  const activeCtx = ctx || (flow.num ? {
-    biller: { n: flow.operatorName, logo: flow.operatorLogo, a: flow.operatorName ? flow.operatorName.slice(0,2) : "BL", c: "#3B0764", walletAllowed: true },
+  // Derive activeCtx prioritizing flow (useRecharge single source of truth for active transaction)
+  const activeCtx = flow.num ? {
+    biller: { n: flow.operatorName, logo: flow.operatorLogo, a: flow.operatorName ? flow.operatorName.slice(0, 2).toUpperCase() : "BL", c: "#3B0764", walletAllowed: true },
     catTitle: flow.serviceType,
     categoryType: flow.serviceType,
     account: flow.num,
+    operator: flow.operator,
     session_id: flow.session_id,
     billdata: flow.billdata,
     slabs: flow.slabs,
     billAmount: flow.billAmount || flow.amount,
     amount: flow.amount || flow.billAmount,
     custName: flow.custName,
+    details: flow.details,
     title: "Customer Information",
-  } : null);
+  } : (ctx || null);
 
   useEffect(() => {
     if (!activeCtx) {
@@ -45,7 +48,17 @@ export default function BillPayPage() {
     });
 
     const custName = rawBilldata["Customer Name"] || activeCtx.custName || null;
-    const subtitleText = custName ? custName : `${activeCtx.catTitle || activeCtx.categoryType || "Biller"} · ${activeCtx.account}`;
+
+    const currentActiveAmount =
+      Number(flow.amount) > 0
+        ? Number(flow.amount)
+        : (Number(activeCtx.amount) > 0
+            ? Number(activeCtx.amount)
+            : (Number(activeCtx.billAmount) > 0
+                ? Number(activeCtx.billAmount)
+                : (Number(flow.billAmount) > 0
+                    ? Number(flow.billAmount)
+                    : 0)));
 
     setReq({
       mode: "bill",
@@ -58,10 +71,10 @@ export default function BillPayPage() {
       session_id: activeCtx.session_id,
       rawBilldata: rawBilldata,
       slabs: activeCtx.slabs || [],
-      amount: activeCtx.amount || activeCtx.billAmount || 0,
-      billAmount: activeCtx.billAmount || 0,
+      amount: currentActiveAmount,
+      billAmount: activeCtx.billAmount || flow.billAmount || 0,
       details: activeCtx.details || flow.details || null,
-      editableAmount: true,
+      editableAmount: activeCtx.editable !== false && flow.amountEditable !== false,
       amin: activeCtx.amin || 1,
       amax: activeCtx.amax || 50000,
       walletAllowed: activeCtx.biller?.walletAllowed !== false,
@@ -76,12 +89,13 @@ export default function BillPayPage() {
         { k: "Order ID", v: txnId, mono: true },
       ],
     });
-  }, [activeCtx, setReq, router]);
+  }, [activeCtx, setReq, router, flow.num, flow.amount, flow.session_id, flow.operatorName]);
 
   if (!activeCtx) return null;
+  const fallbackBackHref = activeCtx.categoryType ? `/billers?type=${activeCtx.categoryType}` : `/billers/form?type=DTH`;
   return (
     <>
-      <SubHeader title="Payment Details" backHref={`/billers/form?type=${activeCtx.categoryType || "DTH"}${activeCtx.operator || activeCtx.biller?.id ? `&operator=${activeCtx.operator || activeCtx.biller?.id}` : ""}`} />
+      <SubHeader title="Payment Details" backHref={fallbackBackHref} />
       <PayScreen />
     </>
   );

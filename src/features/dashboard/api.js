@@ -67,7 +67,10 @@ try {
 
     return parsed;
   } catch (error) {
-    console.error("fetchOperatorsList failed:", error);
-    throw error;
+    console.warn("fetchOperatorsList network fetch failed:", error);
+    if (error?.data && typeof error.data === "object") {
+      return error.data;
+    }
+    return null;
   }
 }

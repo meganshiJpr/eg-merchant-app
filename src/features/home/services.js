@@ -9,6 +9,8 @@ export const serviceGroups = [
       { key: "water", label: "Water", color: "var(--teal)", soft: "var(--teal-soft)", href: "/billers?type=Water" },
       { key: "gas", label: "Gas", color: "var(--violet)", soft: "var(--violet-soft)", href: "/billers?type=Gas" },
       { key: "fastag", label: "FASTag", color: "var(--primary)", soft: "var(--primary-soft)", href: "/billers?type=FASTag" },
+      { key: "subscription", label: "Subscription", color: "var(--primary)", soft: "var(--primary-soft)", href: "/billers?type=Subscription" },
+
     ],
   },
   {

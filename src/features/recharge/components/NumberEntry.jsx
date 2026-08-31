@@ -56,8 +56,20 @@ export function NumberEntry({ historyData, onDetected }) {
 
   // Filter Prepaid Operators ONLY from session contractor_list_session
   const prepaidOps = useMemo(() => {
-    const rawOps = sessionData?.operators?.all || (Array.isArray(sessionData) ? sessionData : []);
-    if (!Array.isArray(rawOps)) return [];
+    const allOps =
+      sessionData?.operators?.all ||
+      sessionData?.data?.operators?.all ||
+      sessionData?.operators ||
+      sessionData?.data?.operators;
+
+    const rawOps = Array.isArray(allOps)
+      ? allOps
+      : allOps && typeof allOps === "object"
+        ? Object.values(allOps)
+        : Array.isArray(sessionData)
+          ? sessionData
+          : [];
+
     return rawOps.filter((op) => !op.type || op.type === "Prepaid");
   }, [sessionData]);
 
@@ -94,14 +106,35 @@ export function NumberEntry({ historyData, onDetected }) {
 
         const hData = historyData || historyRes || {};
         const map = {};
-        let rawOps = opData?.operators?.all || opData?.operators || opData || [];
+        const allOps =
+          opData?.operators?.all ||
+          opData?.data?.operators?.all ||
+          opData?.operators ||
+          opData?.data?.operators ||
+          opData;
+
+        const rawOps = Array.isArray(allOps)
+          ? allOps
+          : allOps && typeof allOps === "object"
+            ? Object.values(allOps)
+            : [];
+
         if (Array.isArray(rawOps)) {
-          const logoPath = `${process.env.NEXT_PUBLIC_API_BASE_URL}/images/operators/`;
+          const logoPath =
+            opData?.operator_img ||
+            opData?.data?.operator_img ||
+            "https://staging.paybyapis.com/images/operators/";
+
           rawOps.forEach((op) => {
+            if (!op) return;
             if (op.type === "Prepaid" || !op.type) {
               map[String(op.id)] = {
                 name: op.name,
-                logo: op.logo ? (op.logo.startsWith("http") ? op.logo : `${logoPath}${op.logo}`) : null,
+                logo: op.logo
+                  ? op.logo.startsWith("http")
+                    ? op.logo
+                    : `${logoPath}${op.logo}`
+                  : null,
               };
             }
           });
