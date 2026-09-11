@@ -347,6 +347,7 @@ export function BillerList({ categoryType = "DTH", catIndex = 0 }) {
                       custName: custName,
                       details: planDetails,
                       amountEditable: isEditable,
+                      title: infoRes?.title || "",
                       paymentDetails: null,
                       fromHistory: true,
                     });

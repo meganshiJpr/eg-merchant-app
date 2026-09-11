@@ -5,7 +5,25 @@ const paths = {
   water: <path d="M12 2.5c3.6 4.3 7 8 7 12a7 7 0 0 1-14 0c0-4 3.4-7.7 7-12Z" />,
   gas: <path d="M12 2c1 3.4 4.5 5.4 4.5 9.2 0 1.5-.6 2.8-1.5 3.8.2-2.6-1.2-4.4-3-5.8-1.7 1.4-3.2 3.2-3 5.8-.9-1-1.5-2.3-1.5-3.8C7.5 7.4 11 5.4 12 2Zm0 20a5.5 5.5 0 0 1-5.5-5.5c3.7.4 7.3.4 11 0A5.5 5.5 0 0 1 12 22Z" />,
   fastag: <path d="M3 5h18a1.5 1.5 0 0 1 1.5 1.5v11A1.5 1.5 0 0 1 21 19H3a1.5 1.5 0 0 1-1.5-1.5v-11A1.5 1.5 0 0 1 3 5Zm1 4v2h16V9Zm0 5v2h9v-2Z" />,
-  subscription: <rect x="6.5" y="1.5" width="11" height="21" rx="2.8" />,
+  subscription: <svg viewBox="0 0 24 24"><path d="M6 3.5A2.5 2.5 0 0 1 8.5 1h7A2.5 2.5 0 0 1 18 3.5V8h-2V3.5a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5v17a.5.5 0 0 0 .5.5H15v2H8.5A2.5 2.5 0 0 1 6 20.5v-17Z"></path><path d="M19 9a5 5 0 1 0 4.5 7.2l-1.8-.9A3 3 0 1 1 19 11v2l3-2.5L19 8v1Z"></path></svg>,
+  postpaid:<svg viewBox="0 0 24 24">
+  <rect x="6.5" y="1.5" width="11" height="21" rx="2.8"></rect>
+  <rect x="9" y="4" width="6" height="12" rx="1"></rect>
+  <circle cx="12" cy="19.5" r="1"></circle>
+</svg>,
+  lpg:<svg viewBox="0 0 24 24" >
+  <rect x="7" y="5" width="10" height="15" rx="4"></rect>
+  <rect x="9" y="2.5" width="6" height="3" rx="1"></rect>
+  <rect x="10" y="1" width="4" height="2" rx="0.7"></rect>
+  <rect x="5.5" y="19" width="13" height="2" rx="1"></rect>
+</svg>,
+  creditcard:<svg viewBox="0 0 24 24" >
+  <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+  <rect x="3" y="8" width="18" height="2"></rect>
+  <rect x="6" y="14" width="5" height="1.5" rx=".5"></rect>
+  <rect x="14" y="14" width="4" height="1.5" rx=".5"></rect>
+</svg>,
+  loanrepayment: <><rect x="2" y="6" width="14" height="9.5" rx="2" /><path d="M15.5 15H20l-1.8-1.8 1.4-1.4 3.9 3.9-3.9 3.9-1.4-1.4L20 16.5h-4.5Z" /></>,
 
   aeps: <><circle cx="12" cy="12" r="9.5" /><circle cx="12" cy="12" r="4.3" fill="var(--surface)" /></>,
   dmt: <><rect x="2" y="6" width="14" height="9.5" rx="2" /><path d="M15.5 15H20l-1.8-1.8 1.4-1.4 3.9 3.9-3.9 3.9-1.4-1.4L20 16.5h-4.5Z" /></>,

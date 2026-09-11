@@ -43,6 +43,32 @@ function BenefitAvatar({ item, index }) {
   );
 }
 
+function HighlightText({ text, query }) {
+  if (text === null || text === undefined || text === false) return null;
+  const textStr = String(text);
+  if (!textStr || textStr === "-") return textStr;
+  if (!query || !query.trim()) return textStr;
+
+  const q = query.trim();
+  const escapedQuery = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`(${escapedQuery})`, "gi");
+  const parts = textStr.split(regex);
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === q.toLowerCase() ? (
+          <mark key={i} className="bg-yellow-200 text-yellow-950 px-0.5 rounded-[2px] font-bold">
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
+
 export function PlanSelectionView({ onEdit }) {
   const router = useRouter();
 
@@ -176,17 +202,30 @@ useEffect(() => {
         allPlans = PLANS;
       }
       return allPlans.filter((p) => {
-        const price = Number(p.rs || p.amt || 0);
+        const priceStr = String(p.rs || p.amt || "");
         const validity = (p.validity || p.val || "").toLowerCase();
         const data = (p.data || "").toLowerCase();
         const voice = (p.voice || p.calls || "").toLowerCase();
+        const sms = (p.sms || "").toLowerCase();
         const desc = (p.description || p.desc || "").toLowerCase();
+        const badgeText = (p.badge_text || "").toLowerCase();
+
+        const benefitsText = Array.isArray(p.additional_benefits)
+          ? p.additional_benefits
+              .map((b) => `${b?.title || ""} ${b?.name || ""} ${b?.description || ""}`)
+              .join(" ")
+              .toLowerCase()
+          : "";
+
         return (
-          price.includes(q) ||
+          priceStr.includes(q) ||
           validity.includes(q) ||
           data.includes(q) ||
           voice.includes(q) ||
-          desc.includes(q)
+          sms.includes(q) ||
+          desc.includes(q) ||
+          badgeText.includes(q) ||
+          benefitsText.includes(q)
         );
       });
     }
@@ -199,6 +238,7 @@ useEffect(() => {
   }, [planData, activeCat, searchQuery]);
 
   function selectPlan(p) {
+    if (!p) return;
     const selectedAmt = Number(p.rs || p.amt || 0);
     flowSet({
       mode: "recharge",
@@ -209,7 +249,14 @@ useEffect(() => {
       paymentDetails: null,
       receipt: null,
     });
-    router.push("/recharge/receipt");
+
+    if (sheetPlan) {
+      setSheetPlan(null);
+    }
+
+    setTimeout(() => {
+      router.push("/recharge/receipt");
+    }, 50);
   }
 
   return (
@@ -348,7 +395,7 @@ useEffect(() => {
                       boxShadow: badgeShimmerColor ? `0 0 8px ${badgeShimmerColor}55` : "none",
                     }}
                   >
-                    {badgeText}
+                    <HighlightText text={badgeText} query={searchQuery} />
                   </div>
                 )}
 
@@ -356,7 +403,7 @@ useEffect(() => {
                 <div className={`flex items-center justify-between ${badgeText ? "pt-3" : ""}`}>
                   <div className="flex items-baseline gap-2">
                     <span className="mono font-display text-[21px] font-extrabold text-text-1">
-                      Rs {inr(price)}
+                      Rs <HighlightText text={inr(price)} query={searchQuery} />
                     </span>
                     {perDayCost > 0 && (
                       <span className="text-[12px] font-semibold text-text-3">
@@ -376,7 +423,7 @@ useEffect(() => {
                 <div className="mt-1.5 grid grid-cols-4 divide-x divide-border rounded-xl py-2.5 text-center">
                   <div className="min-w-0 px-1">
                     <div className="flex min-h-[24px] items-start justify-center text-[10px] font-extrabold leading-tight">
-                      {voice}
+                      <HighlightText text={voice} query={searchQuery} />
                     </div>
                     <div className="mt-0.5 text-[10.5px] font-medium text-text-3">
                       Calls
@@ -385,7 +432,7 @@ useEffect(() => {
 
                   <div className="min-w-0 px-1">
                     <div className="flex min-h-[24px] items-start justify-center text-[10px] font-extrabold leading-tight">
-                      {sms}
+                      <HighlightText text={sms} query={searchQuery} />
                     </div>
                     <div className="mt-0.5 text-[10.5px] font-medium text-text-3">
                       SMS
@@ -394,7 +441,7 @@ useEffect(() => {
 
                   <div className="min-w-0 px-1">
                     <div className="flex min-h-[24px] items-start justify-center text-[10px] font-extrabold leading-tight break-words">
-                      {data}
+                      <HighlightText text={data} query={searchQuery} />
                     </div>
                     <div className="mt-0.5 text-[10.5px] font-medium text-text-3">
                       Data
@@ -403,7 +450,7 @@ useEffect(() => {
 
                   <div className="min-w-0 px-1">
                     <div className="flex min-h-[24px] items-start justify-center text-[10px] font-extrabold leading-tight">
-                      {val}
+                      <HighlightText text={val} query={searchQuery} />
                     </div>
                     <div className="mt-0.5 text-[10.5px] font-medium text-text-3">
                       Validity
@@ -414,7 +461,7 @@ useEffect(() => {
                 {/* Single-Line Truncated Description */}
                 {shortDesc && (
                   <p className="-mt-1 truncate text-[12px] font-medium text-text-2">
-                    {shortDesc}
+                    <HighlightText text={shortDesc} query={searchQuery} />
                   </p>
                 )}
 
@@ -430,7 +477,14 @@ useEffect(() => {
                     )}
                     {benefits.length > 0 && (
                       <span className="text-[12px] font-bold text-text-3">
-                        {benefits.length} benefit{benefits.length > 1 ? "s" : ""}
+                        <HighlightText
+                          text={
+                            searchQuery.trim()
+                              ? benefits.map((b) => b.title || b.name).filter(Boolean).join(", ")
+                              : `${benefits.length} benefit${benefits.length > 1 ? "s" : ""}`
+                          }
+                          query={searchQuery}
+                        />
                       </span>
                     )}
                   </div>
@@ -464,7 +518,7 @@ useEffect(() => {
           <div className="flex max-h-[75vh] flex-col overflow-hidden">
             <div className="flex flex-none items-center justify-between pb-3 border-border/40">
               <span className="mono font-display text-[26px] font-extrabold text-text-1">
-                Rs {Number(sheetPlan.rs ?? sheetPlan.amt ?? 0)}
+                Rs <HighlightText text={inr(Number(sheetPlan.rs ?? sheetPlan.amt ?? 0))} query={searchQuery} />
               </span>
               {sheetPlan.per_day_cost > 0 && (
                 <span className="rounded-full bg-primary-soft px-3 py-1 text-[12px] font-bold text-primary">
@@ -479,25 +533,25 @@ useEffect(() => {
               <div className="grid grid-cols-4 divide-x divide-border rounded-xl py-2.5 text-center">
                 <div className="px-1 min-w-0">
                   <div className="text-[10px] leading-tight break-words min-h-[24px] font-extrabold text-text-1">
-                    {sheetPlan.voice || sheetPlan.calls || "-"}
+                    <HighlightText text={sheetPlan.voice || sheetPlan.calls || "-"} query={searchQuery} />
                   </div>
                   <div className="mt-0.5 text-[10.5px] font-medium text-text-3">Calls</div>
                 </div>
                 <div className="px-1 min-w-0">
                   <div className="break-words min-h-[24px] text-[10px] leading-tight font-extrabold text-text-1">
-                    {sheetPlan.sms || "-"}
+                    <HighlightText text={sheetPlan.sms || "-"} query={searchQuery} />
                   </div>
                   <div className="mt-0.5 text-[11px] min-h-[24px] break-words leading-tight font-medium text-text-3">SMS</div>
                 </div>
                 <div className="px-1 min-w-0">
                   <div className="text-[10px] font-extrabold text-text-1 break-words leading-tight min-h-[24px]">
-                    {sheetPlan.data || "-"}
+                    <HighlightText text={sheetPlan.data || "-"} query={searchQuery} />
                   </div>
                   <div className="mt-0.5 text-[10.5px] font-medium text-text-3">Data</div>
                 </div>
                 <div className="px-1 min-w-0">
                   <div className="text-[10px] font-extrabold text-text-1 break-words leading-tight min-h-[24px]">
-                    {sheetPlan.validity || sheetPlan.val || "-"}
+                    <HighlightText text={sheetPlan.validity || sheetPlan.val || "-"} query={searchQuery} />
                   </div>
                   <div className="mt-0.5 text-[10.5px] font-medium text-text-3">Validity</div>
                 </div>
@@ -510,7 +564,7 @@ useEffect(() => {
                     Description
                   </div>
                   <p className="mt-1.5 text-[12.5px] leading-relaxed text-text-2 whitespace-pre-line">
-                    {sheetPlan.description || sheetPlan.desc}
+                    <HighlightText text={sheetPlan.description || sheetPlan.desc} query={searchQuery} />
                   </p>
                 </div>
               )}
@@ -526,10 +580,12 @@ useEffect(() => {
                       <div key={bIdx} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
                         <BenefitAvatar item={b} index={bIdx} />
                         <div className="min-w-0 flex-1">
-                          <span className="block text-[13px] font-bold text-text-1">{b.title}</span>
+                          <span className="block text-[13px] font-bold text-text-1">
+                            <HighlightText text={b.title || b.name} query={searchQuery} />
+                          </span>
                           {b.description && (
                             <span className="block text-[11.5px] font-medium text-text-3">
-                              {b.description}
+                              <HighlightText text={b.description} query={searchQuery} />
                             </span>
                           )}
                         </div>
@@ -543,9 +599,9 @@ useEffect(() => {
             {/* FULL-WIDTH BLUE ACTION BUTTON */}
             <div className="flex-none pt-2.5 bg-surface border-t border-border/40">
               <button
+                type="button"
                 onClick={() => {
                   const p = sheetPlan;
-                  setSheetPlan(null);
                   selectPlan(p);
                 }}
                 className="w-full rounded-xl bg-primary px-4 py-3.5 font-display text-[14px] font-bold text-white shadow-xs active:scale-[0.985] transition"

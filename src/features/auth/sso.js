@@ -11,7 +11,7 @@ export function parseSsoParams(params) {
   params.forEach((v, k) => {
     if (!known.has(k)) extra[k] = v;
   });
-
+                                                                              
   return {
     ssoToken,
     utmSource: params.get("utm_source") ?? undefined,
@@ -21,3 +21,4 @@ export function parseSsoParams(params) {
     extra: Object.keys(extra).length ? extra : undefined,
   };
 }
+ 

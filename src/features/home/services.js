@@ -1,21 +1,38 @@
 export const serviceGroups = [
-  {
-    title: "Recharge and Bills",
+   {
+    title: "Recharges",
     barColor: "var(--primary)",
     items: [
       { key: "mobile", label: "Mobile", color: "var(--primary)", soft: "var(--primary-soft)", href: "/recharge" },
       { key: "dth", label: "DTH", color: "var(--accent)", soft: "var(--accent-soft)", href: "/billers?type=DTH" },
+      { key: "subscription", label: "Subscription", color: "var(--primary)", soft: "var(--primary-soft)", href: "/billers?type=Subscription" },
+
+    ],
+  },
+  {
+    title: "Bill Payments",
+    barColor: "var(--primary)",
+    viewAll:true,
+    logo:true,
+    items: [
+      // { key: "mobile", label: "Mobile", color: "var(--primary)", soft: "var(--primary-soft)", href: "/recharge" },
+      // { key: "dth", label: "DTH", color: "var(--accent)", soft: "var(--accent-soft)", href: "/billers?type=DTH" },
+      { key: "postpaid", label: "Postpaid", color: "var(--primary)", soft: "var(--primary-soft)", href: "/billers?type=Postpaid" },
+      { key: "lpg", label: "LPG", color: "var(--accent)", soft: "var(--accent-soft)", href: "/billers?type=Cylinder" },
+      { key: "creditcard", label: "Credit Card",  color: "var(--teal)", soft: "var(--teal-soft)", href: "/billers?type=CreditCard" },
+      { key: "loanrepayment", label: "Loan Repayment",  color: "var(--orange)", soft: "var(--orange-soft)", href: "/billers?type=LoanEMI" },
       { key: "electricity", label: "Electricity", color: "var(--orange)", soft: "var(--orange-soft)", href: "/billers?type=Electricity" },
       { key: "water", label: "Water", color: "var(--teal)", soft: "var(--teal-soft)", href: "/billers?type=Water" },
       { key: "gas", label: "Gas", color: "var(--violet)", soft: "var(--violet-soft)", href: "/billers?type=Gas" },
       { key: "fastag", label: "FASTag", color: "var(--primary)", soft: "var(--primary-soft)", href: "/billers?type=FASTag" },
-      { key: "subscription", label: "Subscription", color: "var(--primary)", soft: "var(--primary-soft)", href: "/billers?type=Subscription" },
+      // { key: "subscription", label: "Subscription", color: "var(--primary)", soft: "var(--primary-soft)", href: "/billers?type=Subscription" },
 
     ],
   },
   {
     title: "Banking Services",
     barColor: "var(--teal)",
+    logo:false,
     items: [
       { key: "aeps", label: "AEPS", color: "var(--teal)", soft: "var(--teal-soft)" },
       { key: "dmt", label: "Money Transfer", color: "var(--violet)", soft: "var(--violet-soft)" },
@@ -27,6 +44,7 @@ export const serviceGroups = [
   },
   {
     title: "Business Tools",
+    logo:false,
     barColor: "var(--accent)",
     items: [
       { key: "khaata", label: "Khaata Book", color: "var(--accent)", soft: "var(--accent-soft)", href: "/khaata" },
@@ -37,6 +55,7 @@ export const serviceGroups = [
   },
   {
     title: "More Services",
+    logo:false,
     barColor: "var(--violet)",
     items: [
       { key: "insurance", label: "Insurance", color: "var(--teal)", soft: "var(--teal-soft)" },

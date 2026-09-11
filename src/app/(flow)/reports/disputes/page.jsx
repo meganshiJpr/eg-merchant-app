@@ -1,59 +1,347 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { SubHeader } from "@/components/ui/SubHeader";
-import { SearchInput } from "@/components/ui/SearchInput";
-import { DateChips } from "@/components/ui/DateChips";
-import { Select } from "@/components/ui/Select";
-import { Pill } from "@/components/ui/Pill";
-import { DISPUTES, SVC_COLOR, SVC_SOFT, withinDays } from "@/features/reports/data";
-import { fmtDate, inr } from "@/utils/format";
-
-const DAYS = [1, 7, 30, 0];
-const LABEL = { open: "Open", progress: "In Progress", resolved: "Resolved", rejected: "Rejected" };
-const ST_MAP = { "all status": "all", open: "open", "in progress": "progress", resolved: "resolved", rejected: "rejected" };
+import { fetchDisputeComplainHistory } from "@/features/reports/api";
+import { ReportHeaderFilterBar } from "@/features/reports/components/ReportHeaderFilterBar";
+import { ReportFilterSheet } from "@/features/reports/components/ReportFilterSheet";
+import { inr } from "@/utils/format";
+import { formatRequestTime, getCategoriesFromSession, generateMonthsList, getDateRange } from "@/utils/transaction";
 
 export default function DisputesPage() {
-  const [dateI, setDateI] = useState(2);
-  const [status, setStatus] = useState("All status");
-  const [q, setQ] = useState("");
-  const rows = useMemo(() => {
-    const needle = q.replace(/\s/g, "").toLowerCase();
-    const st = ST_MAP[status.toLowerCase()];
-    return DISPUTES.filter((x) => withinDays(x.t, DAYS[dateI]) &&
-      (st === "all" || x.st === st) &&
-      (!needle || x.cid.toLowerCase().includes(needle) || x.txn.toLowerCase().includes(needle) || x.acct.replace(/\s/g, "").toLowerCase().includes(needle)));
-  }, [dateI, status, q]);
+  const [historyData, setHistoryData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [operatorImgBase, setOperatorImgBase] = useState("https://staging.paybyapis.com/images/operators/");
+  const [dummyImg, setDummyImg] = useState("dummy.png");
+
+  const [previousMonthsFilter, setPreviousMonthsFilter] = useState([]);
+  const [dynamicCategories, setDynamicCategories] = useState([]);
+
+  const [dateTab, setDateTab] = useState("all");
+  const [keyword, setKeyword] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  const [selectedMonth, setSelectedMonth] = useState("all");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+
+  const [appliedFilters, setAppliedFilters] = useState({
+    from: "",
+    to: "",
+    keyword: "",
+  });
+
+  const loadingRef = useRef(false);
+
+  useEffect(() => {
+    const cats = getCategoriesFromSession();
+    setDynamicCategories(cats);
+  }, []);
+
+  const loadDisputes = useCallback(async (pageNum, filters, isAppend = false) => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+
+    if (isAppend) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+      setError(null);
+    }
+
+    const payload = {
+      page: pageNum,
+      from: filters.from || "",
+      to: filters.to || "",
+      keyword: filters.keyword || "",
+    };
+
+    console.log("Loading dispute complain history with payload:", payload);
+
+    try {
+      const res = await fetchDisputeComplainHistory(payload);
+
+      if (res?.operator_img) setOperatorImgBase(res.operator_img);
+      if (res?.operator_dunmy_img) setDummyImg(res.operator_dunmy_img);
+
+      const rawItems = res?.history_data || [];
+      const items = Array.isArray(rawItems) ? rawItems : [];
+
+      if (isAppend) {
+        setHistoryData((prev) => [...prev, ...items]);
+      } else {
+        setHistoryData(items);
+      }
+
+      if (Array.isArray(res?.previousMonthsFilter) && res.previousMonthsFilter.length > 0) {
+        setPreviousMonthsFilter(res.previousMonthsFilter);
+      } else if (typeof res?.previousMonthsFilter === "number" && res.previousMonthsFilter > 0) {
+        setPreviousMonthsFilter(generateMonthsList(res.previousMonthsFilter));
+      } else {
+        setPreviousMonthsFilter((prev) => (prev.length === 0 ? generateMonthsList(12) : prev));
+      }
+
+      const remainingNum = res?.remaining_pages !== undefined ? Number(res.remaining_pages) : null;
+      if (remainingNum !== null && !isNaN(remainingNum)) {
+        setHasMore(remainingNum > 0);
+      } else {
+        setHasMore(items.length > 0);
+      }
+
+      setPage(pageNum);
+    } catch (err) {
+      console.error("Error loading dispute complain history:", err);
+      if (!isAppend) setError("Failed to load dispute complain history.");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+      loadingRef.current = false;
+    }
+  }, []);
+
+  useEffect(() => {
+    loadDisputes(1, appliedFilters, false);
+  }, [appliedFilters, loadDisputes]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (loading || loadingMore || !hasMore || loadingRef.current) return;
+
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const fullHeight = document.documentElement.scrollHeight;
+
+      if (scrollTop + windowHeight >= fullHeight - 120) {
+        loadDisputes(page + 1, appliedFilters, true);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [loading, loadingMore, hasMore, page, appliedFilters, loadDisputes]);
+
+  const handleSearch = (val) => {
+    setKeyword(val);
+    const newFilters = { ...appliedFilters, keyword: val.trim() };
+    setAppliedFilters(newFilters);
+  };
+
+  const handleApplyFilters = () => {
+    let fromDate = "";
+    let toDate = "";
+
+    if (selectedMonth === "custom") {
+      fromDate = customFrom;
+      toDate = customTo;
+    } else if (typeof selectedMonth === "object" && selectedMonth !== null) {
+      fromDate = selectedMonth.from || "";
+      toDate = selectedMonth.to || "";
+    }
+
+    const newFilters = {
+      from: fromDate,
+      to: toDate,
+      keyword: keyword.trim(),
+    };
+
+    setAppliedFilters(newFilters);
+    setFilterOpen(false);
+  };
+
+  const handleResetFilters = () => {
+    setSelectedMonth("all");
+    setCustomFrom("");
+    setCustomTo("");
+    setSelectedCategory("all");
+    setSelectedStatus("all");
+    const newFilters = {
+      from: "",
+      to: "",
+      keyword: keyword.trim(),
+    };
+    setAppliedFilters(newFilters);
+    setFilterOpen(false);
+  };
+
+
+
+  const getLogoUrl = (item) => {
+    const logoFile = item.logo || item.operator_logo;
+    if (!logoFile) return `${operatorImgBase}${dummyImg}`;
+    if (logoFile.startsWith("http")) return logoFile;
+    return `${operatorImgBase}${logoFile}`;
+  };
 
   return (
-    <>
-      <SubHeader title="Disputes & Complaints" backHref="/reports" />
-      <div className="flex flex-col gap-3 p-4">
-        <SearchInput value={q} onChange={setQ} placeholder="Search complaint ID, order ID or number" />
-        <DateChips active={dateI} onChange={setDateI} />
-        <Select value={status} onChange={setStatus} options={["All status", "Open", "In Progress", "Resolved", "Rejected"]} />
-        <div className="flex flex-col gap-2">
-          {rows.map((x) => (
-            <div key={x.cid} className="flex items-start gap-3 rounded-xl border border-border bg-surface px-3 py-3">
-              <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-xl" style={{ background: SVC_SOFT[x.svc] ?? "var(--primary-soft)" }}>
-                <svg viewBox="0 0 24 24" className="h-[19px] w-[19px]" style={{ fill: SVC_COLOR[x.svc] ?? "var(--primary)" }}><path d="M12 2 1.5 20.5h21Zm1.1 13.6h-2.2v-5h2.2Zm0 3.4h-2.2v-2.2h2.2Z" /></svg>
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="text-[12.5px] font-semibold">{x.svc} · {x.op} · {x.acct}</div>
-                <div className="mono mt-0.5 text-[10.5px] text-text-3">{x.cid} · Txn {x.txn}</div>
-                <div className="mono text-[10.5px] text-text-3">{fmtDate(x.t)}</div>
-                <div className="mt-1 text-[11px] leading-snug text-text-2">{x.remark}</div>
-                {x.res && <div className="mt-0.5 text-[11px] font-semibold leading-snug" style={{ color: x.st === "rejected" ? "var(--accent)" : "var(--teal)" }}>{x.res}</div>}
-              </div>
-              <div className="flex-none text-right">
-                <div className="mono text-[13px] font-semibold">Rs {inr(x.amt)}</div>
-                <Pill tone={x.st}>{LABEL[x.st]}</Pill>
-              </div>
+    <div className="min-h-screen bg-[#f4f5fa] pb-24 max-w-app mx-auto text-text-1">
+      <SubHeader title="Disputes & Complaints" backHref="/reports" showImg={false} />
+
+      <div className="p-4 space-y-4">
+        <ReportHeaderFilterBar
+          keyword={keyword}
+          onKeywordChange={handleSearch}
+          placeholder="Complaint ID / Order ID / Number"
+          onFilterClick={() => setFilterOpen(true)}
+          activeDateTab={dateTab}
+          onDateTabChange={(tabId) => {
+            setDateTab(tabId);
+            setAppliedFilters((prev) => ({
+              ...prev,
+              ...getDateRange(tabId),
+            }));
+          }}
+        />
+
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <span className="h-8 w-8 animate-spin rounded-full border-3 border-border border-t-primary" />
+            <span className="mt-3 text-[13px] font-medium text-text-2">Loading complaints history...</span>
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
+            <p className="text-[13px] font-medium text-rose-600">{error}</p>
+            <button
+              type="button"
+              onClick={() => loadDisputes(1, appliedFilters, false)}
+              className="rounded-xl bg-primary px-4 py-2 text-[13px] font-bold text-white shadow-xs"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {!loading && !error && historyData.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-surface shadow-xs text-text-3">
+              <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-current" strokeWidth="2">
+                <path d="M12 2 1.5 20.5h21Zm1.1 13.6h-2.2v-5h2.2Zm0 3.4h-2.2v-2.2h2.2Z" />
+              </svg>
             </div>
-          ))}
-          {!rows.length && <div className="py-6 text-center text-[12.5px] text-text-3">No complaints for these filters</div>}
-        </div>
+            <h3 className="mt-3 text-[15px] font-bold text-text-1">No Complaints Found</h3>
+            <p className="mt-1 text-[12.5px] text-text-3">Try adjusting your search query or date filters.</p>
+          </div>
+        )}
+
+        {!loading && !error && historyData.length > 0 && (
+          <div className="space-y-3">
+            {historyData.map((item, idx) => {
+              const statusStr = String(item.status || "PENDING").toUpperCase();
+              const isPending = statusStr === "PENDING" || statusStr === "OPEN" || statusStr === "IN PROGRESS";
+              const isResolved = statusStr === "RESOLVED" || statusStr === "SUCCESS" || statusStr === "APPROVED";
+              const isRejected = statusStr === "REJECTED" || statusStr === "FAILED";
+              const rawAmt = Number(item.amount || 0);
+              const opName = item.operator_name || "Operator";
+              const dateStr = formatRequestTime(item.dispute_date || item.request_time);
+
+              return (
+                <div
+                  key={item.complaint_id || item.order_id || idx}
+                  className="rounded-2xl border border-border bg-surface p-3.5 shadow-2xs space-y-2 relative"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-display text-[12px] font-bold text-text-1">
+                        Complaint ID: {item.complaint_id || "-"}
+                      </span>
+                      <div className="text-[11px] font-medium text-text-3 mt-0.5">
+                        {dateStr}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="mono text-[15px] font-extrabold text-text-1">
+                        ₹{inr(rawAmt)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={getLogoUrl(item)}
+                        alt={opName}
+                        className="h-10 w-10 flex-none object-contain p-1 rounded-xl"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = `${operatorImgBase}${dummyImg}`;
+                        }}
+                      />
+
+                      <div>
+                        <div className="font-display text-[12.5px] font-bold text-text-1 truncate max-w-[180px]">
+                          {opName}
+                        </div>
+                        <div className="mono text-[11px] font-medium text-text-2">
+                          {item.number || "-"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <span
+                      className={`rounded-md border px-2 py-0.5 text-[9.5px] font-extrabold uppercase tracking-wide ${
+                        isResolved
+                          ? "border-emerald-500/40 bg-emerald-50 text-emerald-600"
+                          : isRejected
+                          ? "border-rose-500/40 bg-rose-50 text-rose-600"
+                          : "border-amber-500/40 bg-amber-50 text-amber-600"
+                      }`}
+                    >
+                      {statusStr}
+                    </span>
+                  </div>
+
+                  <div className=" space-y-1 text-[11.5px]">
+                    <div className="font-medium text-text-2">
+                      Order ID: <span className="mono font-semibold text-text-1">{item.order_id || "-"}</span>
+                    </div>
+                    {item?.description && (
+                      <div className="text-text-3 font-medium">
+                        {item?.description}
+                      </div>
+                    )}
+                    {item?.remarks && (
+                      <div className="font-semibold text-[12px] text-emerald-600">
+                      {item?.remarks}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+
+            {loadingMore && (
+              <div className="flex items-center justify-center py-4 gap-2 text-text-3">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-border border-t-primary" />
+                <span className="text-[12.5px] font-medium">Loading more complaints...</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </>
+
+      <ReportFilterSheet
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        showCategories={false}
+        showStatus={false}
+        monthsFilter={previousMonthsFilter}
+        selectedMonth={selectedMonth}
+        onMonthChange={setSelectedMonth}
+        customFrom={customFrom}
+        onCustomFromChange={setCustomFrom}
+        customTo={customTo}
+        onCustomToChange={setCustomTo}
+        onReset={handleResetFilters}
+        onApply={handleApplyFilters}
+      />
+    </div>
   );
 }

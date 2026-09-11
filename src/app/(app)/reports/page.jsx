@@ -9,18 +9,18 @@ const GROUPS = [
     rows: [
       { label: "Transactions", sub: "All recharges and bill payments", href: "/reports/transactions", c: "var(--primary)", s: "var(--primary-soft)" },
       { label: "Disputes & Complaints", sub: "Raised complaints and their status", href: "/reports/disputes", c: "var(--orange)", s: "var(--orange-soft)" },
-      { label: "AEPS Reports", sub: "Withdrawals, deposits, mini statements", c: "var(--teal)", s: "var(--teal-soft)" },
-      { label: "Money Transfer Reports", sub: "DMT transaction history", c: "var(--violet)", s: "var(--violet-soft)" },
+      // { label: "AEPS Reports", sub: "Withdrawals, deposits, mini statements", c: "var(--teal)", s: "var(--teal-soft)" },
+      // { label: "Money Transfer Reports", sub: "DMT transaction history", c: "var(--violet)", s: "var(--violet-soft)" },
     ],
   },
   {
     title: "Account",
     rows: [
       { label: "Wallet Ledger", sub: "Every credit and debit in your wallet", href: "/reports/ledger", c: "var(--primary)", s: "var(--primary-soft)" },
-      { label: "Commission Report", sub: "Earnings by service and by day", href: "/reports/commission", c: "var(--teal)", s: "var(--teal-soft)" },
+      // { label: "Commission Report", sub: "Earnings by service and by day", href: "/reports/commission", c: "var(--teal)", s: "var(--teal-soft)" },
       { label: "Deposit Reports", sub: "Online wallet top-ups via UPI", href: "/reports/deposits", c: "var(--teal)", s: "var(--teal-soft)" },
       { label: "Manual Deposit Requests", sub: "Status of your deposit requests", href: "/reports/manual-deposits", c: "var(--orange)", s: "var(--orange-soft)" },
-      { label: "Refund Report", sub: "Failed transaction refunds", c: "var(--violet)", s: "var(--violet-soft)" },
+      { label: "Refund Report", sub: "Failed transaction refunds",href: "/reports/refund-report", c: "var(--violet)", s: "var(--violet-soft)" },
     ],
   },
 ];

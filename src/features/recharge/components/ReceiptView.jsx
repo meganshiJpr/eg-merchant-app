@@ -1,5 +1,5 @@
 "use client";
-
+ 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useRecharge } from "../store";
@@ -7,7 +7,8 @@ import { fetchPaymentDetails } from "../api";
 import { inr } from "@/utils/format";
 import { resolveOperatorCircleInfo } from "../utils/operatorHelper";
 import { Sheet } from "@/components/ui/Sheet";
-
+import { PaymentSuccessful } from "@/components/ui/PaymentSuccessful";
+ 
 const BG_COLORS = ["#E40000", "#7B2CBF", "#0A2885", "#EE2E7B", "#00A896"];
 
 function BenefitAvatar({ item, index }) {
@@ -59,78 +60,9 @@ export function ReceiptView() {
   const paymentDetails = flow.paymentDetails;
   const isBillerMode = flow.serviceType !== "Prepaid" || flow.mode === "bill";
 
-  // 1. COMPLETED RECEIPT SCREEN (When transaction finishes from PayScreen)
-  if (receipt) {
-    const isSuccess = receipt.status === "success" || receipt.status === "processing";
-
-    const billdataRows = [];
-    if (receipt.billdata?.rows) {
-      receipt.billdata.rows.forEach((r) => {
-        if (r.v !== null && r.v !== undefined && String(r.v).trim() !== "") {
-          billdataRows.push(r);
-        }
-      });
-    } else if (receipt.rawBilldata) {
-      Object.entries(receipt.rawBilldata).forEach(([k, v]) => {
-        if (v !== null && v !== undefined && String(v).trim() !== "") {
-          billdataRows.push({ k, v: String(v).trim() });
-        }
-      });
-    }
-
-    return (
-      <div className="min-h-screen bg-[#f4f5fa] pb-24 p-4 flex flex-col gap-4">
-        {/* Status Header Banner */}
-        <div className="flex flex-col items-center justify-center pt-6 text-center">
-          <span
-            className={`flex h-14 w-14 items-center justify-center rounded-full text-white shadow-md ${
-              isSuccess ? "bg-emerald-500" : "bg-rose-500"
-            }`}
-          >
-            <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-current" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              {isSuccess ? <path d="M5 13l4 4L19 7" /> : <path d="M18 6L6 18M6 6l12 12" />}
-            </svg>
-          </span>
-
-          <h2 className="mt-3 font-display text-[20px] font-bold text-text-1">
-            {isSuccess ? "Transaction Successful" : "Transaction Failed"}
-          </h2>
-          <div className="mono mt-1 text-[28px] font-extrabold text-text-1">
-            Rs {inr(receipt.amount)}
-          </div>
-        </div>
-
-        {/* Transaction Details */}
-        <div className="rounded-2xl border border-border bg-surface px-4 py-3 shadow-2xs">
-          <div className="mb-2 text-[12px] font-bold uppercase tracking-wider text-text-3">
-            Transaction Details
-          </div>
-          {receipt.rows?.map((r) => (
-            <div key={r.k} className="flex justify-between border-t border-border/50 py-2.5 text-[12.5px]">
-              <span className="text-text-3">{r.k}</span>
-              <span className={`font-semibold ${r.mono ? "mono" : ""} text-text-1`}>{r.v}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Home Button */}
-        <button
-          type="button"
-          onClick={() => {
-            flow.set({ receipt: null });
-            router.replace("/");
-          }}
-          className="mt-2 w-full rounded-xl bg-primary py-3.5 font-display text-[14px] font-bold text-white shadow-xs active:scale-[0.985] transition"
-        >
-          Go to Home
-        </button>
-      </div>
-    );
-  }
-
-  // 2. PRE-PAYMENT DETAILS VIEW (For Mobile Recharge and Billers)
+  // 2. PRE-PAYMENT DETAILS VIEW (For Mobile Recharge and Billers) - Call ALL hooks top-level
   useEffect(() => {
-    if (paymentDetails) {
+    if (receipt || paymentDetails) {
       setLoadingPaymentDetails(false);
       return undefined;
     }
@@ -183,7 +115,75 @@ export function ReceiptView() {
     return () => {
       active = false;
     };
-  }, [paymentDetails, plan, flow.num, flow.account, flow.session_id, flow.operatorPlanSessionId, flow.operator, flow.circle, flow.serviceType, flow.categoryType, flow.amount, flow.billAmount, flow.set]);
+  }, [receipt, paymentDetails, plan, flow.num, flow.account, flow.session_id, flow.operatorPlanSessionId, flow.operator, flow.circle, flow.serviceType, flow.categoryType, flow.amount, flow.billAmount, flow.set]);
+
+  // 1. COMPLETED RECEIPT SCREEN (When transaction finishes from PayScreen)
+  if (receipt) {
+    const isSuccess = receipt.status === "success" || receipt.status === "processing";
+
+    if (isSuccess) {
+      return (
+        <PaymentSuccessful
+          receiptData={{
+            ...receipt,
+            operator: flow.operatorName || (typeof flow.operator === "object" ? flow.operator?.name : flow.operator),
+            serviceType: flow.serviceType || flow.categoryType,
+            account: flow.num || flow.account,
+            customerName: flow.custName || flow.name,
+          }}
+          onClose={() => {
+            flow.set({ receipt: null });
+            router.replace("/");
+          }}
+        />
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-[#f4f5fa] pb-24 p-4 flex flex-col gap-4">
+        {/* Status Header Banner */}
+        <div className="flex flex-col items-center justify-center pt-6 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full text-white shadow-md bg-rose-500">
+            <svg viewBox="0 0 24 24" className="h-7 w-7 fill-none stroke-current" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </span>
+
+          <h2 className="mt-3 font-display text-[20px] font-bold text-text-1">
+            Transaction Failed
+          </h2>
+          <div className="mono mt-1 text-[28px] font-extrabold text-text-1">
+            Rs {inr(receipt.amount)}
+          </div>
+        </div>
+
+        {/* Transaction Details */}
+        <div className="rounded-2xl border border-border bg-surface px-4 py-3 shadow-2xs">
+          <div className="mb-2 text-[12px] font-bold uppercase tracking-wider text-text-3">
+            Transaction Details
+          </div>
+          {receipt.rows?.map((r) => (
+            <div key={r.k} className="flex justify-between border-t border-border/50 py-2.5 text-[12.5px]">
+              <span className="text-text-3">{r.k}</span>
+              <span className={`font-semibold ${r.mono ? "mono" : ""} text-text-1`}>{r.v}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Home Button */}
+        <button
+          type="button"
+          onClick={() => {
+            flow.set({ receipt: null });
+            router.replace("/");
+          }}
+          className="mt-2 w-full rounded-xl bg-primary py-3.5 font-display text-[14px] font-bold text-white shadow-xs active:scale-[0.985] transition"
+        >
+          Go to Home
+        </button>
+      </div>
+    );
+  }
 
   if (loadingPaymentDetails) {
     return (
@@ -256,30 +256,65 @@ export function ReceiptView() {
   });
 
   const handlePayment = () => {
-    console.log("Payment:", {
-      amount,
-      useWallet,
-      walletAmount,
-      payableAmount,
-      paymentDetails,
+    const txnId = `RC${Date.now().toString().slice(-9)}`;
+    const bConnectTxnId = `CC01${Date.now().toString().slice(-10)}`;
+    const finalAmount = amount > 0 ? amount : 100;
+    const paidViaStr = useWallet ? "UPI" : "UPI";
+
+    flow.set({
+      receipt: {
+        status: "success",
+        amount: finalAmount,
+        paidVia: paidViaStr,
+        via: paidViaStr,
+        bConnectTxnId: bConnectTxnId,
+        billerId: "BL1094852",
+        billerName: operator,
+        operator: operator,
+        category: flow.serviceType || "DTH Recharge",
+        account: activeNum,
+        customerName: custName || "RAJESH KUMAR",
+        customerNumber: activeNum,
+        billDate: "01/09/2026",
+        billPeriod: "Monthly",
+        billNumber: "BL-9485721",
+        dueDate: "15/09/2026",
+        convenienceFee: "Rs 0.00",
+        billAmount: finalAmount,
+        totalAmount: finalAmount,
+        dateTime: new Date().toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" }),
+        initiatingChannel: "Agent App",
+        rows: [
+          { k: "Operator", v: operator },
+          { k: "Category", v: flow.serviceType || "Recharge" },
+          { k: "Account", v: activeNum, mono: true },
+          { k: "Customer", v: custName || "RAJESH KUMAR" },
+          { k: "Paid via", v: paidViaStr },
+          { k: "Date & time", v: new Date().toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" }) },
+          { k: "Txn ID", v: txnId, mono: true },
+        ],
+      },
     });
   };
+
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f4f5fa] pb-24 text-text-1">
       {/* FIXED HEADER */}
-      <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-surface px-4 py-3 shadow-2xs">
+      <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-primary px-4 py-3 shadow-2xs">
         <button
           type="button"
           onClick={() => router.back()}
           aria-label="Back"
           className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface shadow-2xs transition active:scale-95"
         >
-          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-text-1" aria-hidden="true">
+          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-primary" aria-hidden="true">
             <path d="M15.5 4.5 8 12l7.5 7.5-1.8 1.8L4.4 12l9.3-9.3Z" />
           </svg>
         </button>
-        <h1 className="font-display text-[16px] font-semibold text-text-1">Payment Details</h1>
+        <h1 className="font-display text-[16px] font-semibold text-white">Payment Details</h1>
+        <img src="/bharat-connect-reverse-logo.png" alt="Bharat Connect" className="h-[2.55rem] ml-auto object-containn" />
+
       </div>
 
       {/* MIDDLE SCROLLABLE CONTENT */}
@@ -441,13 +476,13 @@ export function ReceiptView() {
             <span className="text-text-3">Recharge amount</span>
             <span className="mono font-medium text-text-1">Rs {inr(amount)}</span>
           </div>
-
+          {/* 
           {useWallet && (
             <div className="flex items-center justify-between py-1.5 text-[13px]">
-              <span className="text-text-3">Paid from wallet</span>
+              <span className="text-text-3">Paid from UPI</span>
               <span className="mono font-medium text-text-1">Rs {inr(walletAmount)}</span>
             </div>
-          )}
+          )} */}
 
           {/* Convenience Charge Fee (CCF) */}
           <div className="flex items-center justify-between py-1.5 text-[13px]">
@@ -472,7 +507,7 @@ export function ReceiptView() {
           </div>
 
           {/* Cashback discount */}
-          {details?.cashback_discount && (
+          {details?.cashback_discount>0 && (
             <div className="flex items-center justify-between py-1.5 text-[13px]">
               <span className="text-text-3">Cashback discount</span>
               <span className="mono font-medium text-text-1">Rs {details?.cashback_discount}</span>
@@ -490,7 +525,7 @@ export function ReceiptView() {
 
           <div className="flex items-center justify-between py-1.5">
             <span className="text-[13.5px] font-bold text-text-1">
-              {useWallet ? "Total from wallet" : "Total payable"}
+              {useWallet ? "Amount to be paid" : "Total payable"}
             </span>
             <span className="mono text-[14px] font-bold text-text-1">
               Rs {inr(details?.total_payable || amount)}
@@ -504,7 +539,7 @@ export function ReceiptView() {
         <button
           type="button"
           onClick={handlePayment}
-          className="flex items-center w-full justify-center gap-2 rounded-xl bg-[#1018ff] py-4 font-display text-[16px] font-bold text-white shadow-sm transition active:scale-[0.99]"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3.5 font-display text-[13.5px] font-semibold text-white active:scale-[0.985] disabled:opacity-40 disabled:active:scale-100 transition shadow-xs"
         >
           <span>Proceed to pay</span>
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20">

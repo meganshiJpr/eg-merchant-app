@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Sheet } from "@/components/ui/Sheet";
 import { useToast } from "@/components/ui/Toast";
+import { UpdateMpin } from "@/features/profile/api";
 
 export function ChangePinSheet({ open, onClose }) {
   const toast = useToast((t) => t.show);
@@ -10,14 +11,63 @@ export function ChangePinSheet({ open, onClose }) {
   const [next, setNext] = useState("");
   const [conf, setConf] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function submit() {
-    if (cur.length !== 4 || next.length !== 4 || conf.length !== 4) return setErr("All PINs must be 4 digits.");
-    if (next !== conf) return setErr("New PIN and confirmation do not match.");
-    if (next === cur) return setErr("New PIN must be different from the current one.");
-    setErr(""); setCur(""); setNext(""); setConf("");
+  const resetForm = () => {
+    setCur("");
+    setNext("");
+    setConf("");
+    setErr("");
+    setLoading(false);
+  };
+
+  const handleClose = () => {
+    resetForm();
     onClose();
-    toast("MPIN changed successfully");
+  };
+
+  async function submit() {
+    if (cur.length !== 4 || next.length !== 4 || conf.length !== 4) {
+      return setErr("All PINs must be 4 digits.");
+    }
+    if (next !== conf) {
+      return setErr("New PIN and confirmation do not match.");
+    }
+    if (next === cur) {
+      return setErr("New PIN must be different from the current one.");
+    }
+
+    setErr("");
+    setLoading(true);
+
+    try {
+      const res = await UpdateMpin({
+        old_mpin: cur,
+        new_mpin: next,
+      });
+
+      const isSuccess = res?.success === true || res?.success === 1 || res?.status === true || res?.status === "true" || res?.status === 1;
+
+      const msg =
+        res?.message ||
+        res?.msg ||
+        res?.data?.message ||
+        (isSuccess ? "MPIN updated successfully!" : "Failed to update MPIN. Please try again.");
+
+      if (isSuccess) {
+        toast(msg);
+        resetForm();
+        onClose();
+      } else {
+        setErr(msg);
+      }
+    } catch (error) {
+      const errMsg =
+        error?.data?.message || error?.message || "Failed to update MPIN. Please try again.";
+      setErr(errMsg);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const field = (label, val, set) => (
@@ -25,7 +75,10 @@ export function ChangePinSheet({ open, onClose }) {
       <label className="mb-1.5 block text-[12px] font-semibold text-text-2">{label}</label>
       <input
         value={val}
-        onChange={(e) => set(e.target.value.replace(/\D/g, "").slice(0, 4))}
+        onChange={(e) => {
+          setErr("");
+          set(e.target.value.replace(/\D/g, "").slice(0, 4));
+        }}
         inputMode="numeric"
         type="password"
         maxLength={4}
@@ -36,7 +89,7 @@ export function ChangePinSheet({ open, onClose }) {
   );
 
   return (
-    <Sheet open={open} onClose={onClose}>
+    <Sheet open={open} onClose={handleClose}>
       <div className="mb-3 font-display text-[15px] font-semibold">Change MPIN</div>
       <div className="flex flex-col gap-3">
         {field("Current MPIN", cur, setCur)}
@@ -44,8 +97,13 @@ export function ChangePinSheet({ open, onClose }) {
         {field("Confirm New MPIN", conf, setConf)}
       </div>
       {err && <div className="mt-2.5 text-[11.5px] font-semibold text-accent">{err}</div>}
-      <button onClick={submit} className="mt-4 w-full rounded-xl bg-primary px-4 py-3.5 font-display text-[13.5px] font-semibold text-white">
-        Update MPIN
+      <button
+        type="button"
+        disabled={loading || cur.length !== 4 || next.length !== 4 || conf.length !== 4}
+        onClick={submit}
+        className="mt-4 w-full rounded-xl bg-primary px-4 py-3.5 font-display text-[13.5px] font-semibold text-white transition active:scale-98 disabled:opacity-50"
+      >
+        {loading ? "Updating..." : "Update MPIN"}
       </button>
     </Sheet>
   );

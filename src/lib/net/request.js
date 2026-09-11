@@ -35,8 +35,6 @@ function isExpiredMessage(message) {
 export async function request(path, opts = {}) {
   const { method = "GET", body, auth = true, headers, signal } = opts;
 
-  // Do not let additional requests run once a confirmed expiry has blocked
-  // the application. This avoids repeated API errors behind the overlay.
   if (useSessionExpiryStore.getState().expired) {
     throw new ApiError(440, "SESSION_EXPIRED", "Session expired.");
   }
@@ -82,7 +80,29 @@ export async function request(path, opts = {}) {
       );
     }
     
-    return payload.data;
+    let resData = payload.data;
+    if (typeof resData === "string") {
+      try {
+        const parsed = JSON.parse(resData);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          return {
+            success: payload.success,
+            message: payload.message,
+            ...parsed,
+          };
+        }
+      } catch (e) {
+        // Ignore JSON parse error, return raw string resData below
+      }
+    } else if (resData && typeof resData === "object" && !Array.isArray(resData)) {
+      return {
+        success: payload.success,
+        message: payload.message,
+        ...resData,
+      };
+    }
+
+    return resData;
   }
 
   // No envelope: pass the payload through unchanged.

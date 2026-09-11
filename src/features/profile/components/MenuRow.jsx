@@ -14,6 +14,7 @@ export function MenuGroup({ label, children }) {
 export function MenuRow({
   icon,
   iconBg,
+  iconImage,
   iconColor,
   title,
   sub,
@@ -27,9 +28,21 @@ export function MenuRow({
       className="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-left active:bg-page"
     >
       <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl" style={{ background: iconBg }}>
-        <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" style={{ fill: iconColor }}>
-          {icon}
-        </svg>
+         {iconImage ? (
+          <img
+            src={iconImage}
+            alt=""
+            className="h-6 w-6 object-contain"
+          />
+        ) : (
+          <svg
+            viewBox="0 0 24 24"
+            className="h-[18px] w-[18px]"
+            style={{ fill: iconColor }}
+          >
+            {icon}
+          </svg>
+        )}
       </span>
       <span className="min-w-0 flex-1">
         <span className={`block text-[13px] font-semibold ${danger ? "text-accent" : ""}`}>{title}</span>

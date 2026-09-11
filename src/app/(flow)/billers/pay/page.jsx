@@ -29,7 +29,7 @@ export default function BillPayPage() {
     amount: flow.amount || flow.billAmount,
     custName: flow.custName,
     details: flow.details,
-    title: "Customer Information",
+    title: flow.title || ctx?.title,
   } : (ctx || null);
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function BillPayPage() {
       amin: activeCtx.amin || 1,
       amax: activeCtx.amax || 50000,
       walletAllowed: activeCtx.biller?.walletAllowed !== false,
-      fetched: validRows.length > 0 ? { title: activeCtx.title || "Customer Information", rows: validRows } : null,
+      fetched: validRows.length > 0 ? { title: activeCtx.title || "Bill Details", rows: validRows } : null,
       receiptRows: (amount, via, txnId) => [
         { k: "Operator", v: activeCtx.biller?.n || "Biller" },
         { k: "Category", v: activeCtx.catTitle || activeCtx.categoryType },

@@ -373,6 +373,7 @@ export function BillForm({ categoryType = "DTH", catIndex = 0, billerIndex = 0, 
         custName: custName,
         details: planDetails,
         amountEditable: isEditable,
+        title: infoRes?.title,
         paymentDetails: null,
       });
 
@@ -393,7 +394,7 @@ export function BillForm({ categoryType = "DTH", catIndex = 0, billerIndex = 0, 
         editable: isEditable,
         custName,
         details: planDetails,
-        title: infoRes?.title || "Customer Information",
+        title: infoRes?.title || "Bill Details",
       };
 
       setBill(base);
@@ -410,7 +411,7 @@ export function BillForm({ categoryType = "DTH", catIndex = 0, billerIndex = 0, 
   return (
     <div className="p-4">
       {/* Biller Header */}
-      <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border bg-surface px-3.5 py-3 shadow-2xs">
+      <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border bg-surface px-3.5 mt-2 py-3 shadow-2xs">
         {biller.logo ? (
           <img
             src={biller.logo}

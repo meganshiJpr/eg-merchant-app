@@ -4,7 +4,6 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { SubHeader } from "@/components/ui/SubHeader";
 import { BillForm } from "@/features/billers/components/BillForm";
-import { BILLERS } from "@/features/billers/data";
 
 const CATEGORY_MAP = {
   0: "DTH",
@@ -14,13 +13,6 @@ const CATEGORY_MAP = {
   4: "FASTag",
 };
 
-const TITLE_MAP = {
-  DTH: "DTH Recharge",
-  Electricity: "Electricity Bill",
-  Water: "Water Bill",
-  Gas: "Gas Bill",
-  FASTag: "FASTag Recharge",
-};
 
 function FormInner() {
   const params = useSearchParams();
@@ -33,18 +25,19 @@ function FormInner() {
   if (rawType) {
     categoryType = rawType;
   } else if (rawCat !== null) {
-    categoryType = CATEGORY_MAP[rawCat] || CATEGORY_MAP[parseInt(rawCat, 10)] || "DTH";
+    categoryType = CATEGORY_MAP[rawCat] || CATEGORY_MAP[parseInt(rawCat, 10)] || "";
   }
 
   const catIndex = Math.max(0, Math.min(4, parseInt(rawCat ?? "0", 10)));
   const billerIndex = parseInt(params.get("biller") ?? "0", 10);
-  const title = TITLE_MAP[categoryType] || BILLERS[catIndex]?.title || `${categoryType} Bill`;
-
   const backUrl = rawType ? `/billers?type=${rawType}` : `/billers?cat=${catIndex}`;
+  const type = params.get("type") || "";
+  const formattedType = type.replace(/([a-z])([A-Z])/g, "$1 $2")
+  .replace(/^./, (char) => char.toUpperCase());
 
   return (
-    <>
-      <SubHeader title={title} backHref={backUrl} />
+    <>  
+      <SubHeader title={formattedType} backHref={backUrl} />
       <BillForm
         categoryType={categoryType}
         catIndex={catIndex}

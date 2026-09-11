@@ -9,6 +9,7 @@ import { Sheet } from "@/components/ui/Sheet";
 import { MenuGroup, MenuRow } from "@/features/profile/components/MenuRow";
 import { ICONS } from "@/features/profile/icons";
 import { ChangePinSheet } from "@/features/profile/components/ChangePinSheet";
+import { ResetPinOtpSheet } from "@/features/profile/components/ResetPinOtpSheet";
 
 const LANGS = ["English", "हिन्दी (Hindi)", "मराठी (Marathi)", "ગુજરાતી (Gujarati)"];
 
@@ -26,6 +27,7 @@ export default function ProfilePage() {
 
   const [langOpen, setLangOpen] = useState(false);
   const [pinOpen, setPinOpen] = useState(false);
+  const [resetOtpOpen, setResetOtpOpen] = useState(false);
   const [lang, setLang] = useState("English");
   const [logoutOpen, setLogoutOpen] = useState(false);
 
@@ -87,10 +89,14 @@ export default function ProfilePage() {
         />
         <MenuRow icon={<g dangerouslySetInnerHTML={{ __html: ICONS.globe }} />} iconBg="var(--teal-soft)" iconColor="var(--teal)" title="Language" sub={lang} onClick={() => setLangOpen(true)} />
         <MenuRow icon={<g dangerouslySetInnerHTML={{ __html: ICONS.pin }} />} iconBg="var(--orange-soft)" iconColor="var(--orange)" title="Change MPIN" sub="4-digit transaction PIN" onClick={() => setPinOpen(true)} />
+        <MenuRow icon={<g dangerouslySetInnerHTML={{ __html: ICONS.keyboard }} />} iconBg="var(--violet-soft)" iconColor="var(--violet)" title="Reset M Pin by OTP" sub="OTP will be sent to your registered mobile number" onClick={() => setResetOtpOpen(true)} />
+
       </MenuGroup>
 
       <MenuGroup label="Support">
         <MenuRow icon={<g dangerouslySetInnerHTML={{ __html: ICONS.help }} />} iconBg="var(--violet-soft)" iconColor="var(--violet)" title="Help & Support" sub="FAQs, call, WhatsApp" onClick={() => router.push("/support")} />
+        <MenuRow iconImage="/B-mnemonic-reverse.png" iconBg="var(--primary)"title="Complaint Registration/Tracking" sub="Bharat connect complains" onClick={() => router.push("/profile/complaint-registration")} />
+        <MenuRow iconImage="/B-mnemonic-reverse.png" iconBg="var(--primary)"title="Transaction History" sub="Bharat connect complains" onClick={() => router.push("/profile/transaction-history")} />
         <MenuRow icon={<g dangerouslySetInnerHTML={{ __html: ICONS.logout }} />} iconBg="var(--accent-soft)" iconColor="var(--accent)" title="Log out" danger onClick={() => setLogoutOpen(true)} right={<span />} />
       </MenuGroup>
 
@@ -114,6 +120,7 @@ export default function ProfilePage() {
       </Sheet>
 
       <ChangePinSheet open={pinOpen} onClose={() => setPinOpen(false)} />
+      <ResetPinOtpSheet open={resetOtpOpen} onClose={() => setResetOtpOpen(false)} mobile={merchant?.mobile || merchant?.phone || ""} />
 
       {/* Logout confirm */}
       <Sheet open={logoutOpen} onClose={() => setLogoutOpen(false)}>

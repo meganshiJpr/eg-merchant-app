@@ -4,7 +4,6 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { SubHeader } from "@/components/ui/SubHeader";
 import { BillerList } from "@/features/billers/components/BillerList";
-import { BILLERS } from "@/features/billers/data";
 
 const CATEGORY_MAP = {
   0: "DTH",
@@ -19,13 +18,6 @@ const CATEGORY_MAP = {
   fastag: "FASTag",
 };
 
-const TITLE_MAP = {
-  DTH: "DTH Recharge",
-  Electricity: "Electricity Bill",
-  Water: "Water Bill",
-  Gas: "Gas Bill",
-  FASTag: "FASTag Recharge",
-};
 
 function BillersInner() {
   const params = useSearchParams();
@@ -44,11 +36,14 @@ function BillersInner() {
     Math.min(4, parseInt(rawCat ?? "0", 10))
   );
 
-  const title = TITLE_MAP[categoryType] || BILLERS[catIndex]?.title || `${categoryType} Bill`;
+  const type = params.get("type") || "DTH";
+  const formattedType = type
+  .replace(/([a-z])([A-Z])/g, "$1 $2")
+  .replace(/^./, (char) => char.toUpperCase());
 
   return (
     <>
-      <SubHeader title={title} backHref="/" />
+      <SubHeader title={formattedType} backHref="/" />
       <BillerList categoryType={categoryType} catIndex={catIndex} />
     </>
   );

@@ -125,11 +125,30 @@ export function PayScreen() {
     const deduct = status === "success" || status === "processing";
     if (deduct && walletDebit > 0) wallet.debit(walletDebit);
     const txnId = `${req.mode === "bill" ? "BP" : "RC"}${Date.now().toString().slice(-9)}`;
+    const bConnectTxnId = `CC01${Date.now().toString().slice(-10)}`;
     setReceipt({
       receipt: {
         status,
         amount,
         paidVia: via,
+        via: via,
+        bConnectTxnId: bConnectTxnId,
+        billerId: "BL1094852",
+        billerName: req.line1 || "Tata Play",
+        operator: req.line1 || "Tata Play",
+        category: req.mode === "bill" ? "Bill Payment" : "Recharge",
+        account: req.account || "1234567890",
+        customerName: req.custName || "RAJESH KUMAR",
+        customerNumber: req.account || "1234567890",
+        billDate: "01/09/2026",
+        billPeriod: "Monthly",
+        billNumber: "BL-9485721",
+        dueDate: "15/09/2026",
+        convenienceFee: "Rs 0.00",
+        billAmount: amount,
+        totalAmount: amount,
+        dateTime: new Date().toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" }),
+        initiatingChannel: "Agent App",
         mode: req.mode,
         retryHref: status === "failed" || status === "refunded" ? req.backHref : null,
         rows: req.receiptRows(amount, via, txnId),
@@ -272,7 +291,7 @@ export function PayScreen() {
             <svg viewBox="0 0 24 24" className="h-[15px] w-[15px]">
               <path d="M6 12.5 10.2 16.7 18 8.5" stroke="var(--teal)" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            {req.fetched.title}
+            {req?.fetched?.title}
           </div>
           {req.fetched.rows
             .filter((r) => r.v !== null && r.v !== undefined && String(r.v).trim() !== "")
@@ -371,7 +390,14 @@ export function PayScreen() {
               <span>Fetching payment details...</span>
             </>
           ) : (
+            <>
             <span>{btnLabel}</span>
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </span>
+            </>
           )}
         </button>
       </div>

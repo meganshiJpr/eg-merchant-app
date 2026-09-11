@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect,useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { serviceGroups } from "./services";
 import { useToast } from "@/components/ui/Toast";
 import { ServiceIcon } from "./ServiceIcon";
-import {fetchOperatorsList} from "@/features/dashboard/api";
+import { fetchOperatorsList } from "@/features/dashboard/api";
+import { BillPaymentsView } from "./components/BillPaymentsView";
 
 
 
@@ -39,36 +40,41 @@ function Tile({ s }) {
 }
 
 export function ServiceGrid() {
+  const [showAllBills, setShowAllBills] = useState(false);
+  const hasFetchedRef = useRef(false);
 
- const hasFetchedRef = useRef(false);
+  useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
 
-  useEffect(()=>{
-   
-  if (hasFetchedRef.current) return;
-  hasFetchedRef.current = true;
-
-  async function getOperatorsList() {
-    try {
-      const data = await fetchOperatorsList();
-      
-    } catch (error) {
-      console.error("Error fetching operators list:", error);
+    async function getOperatorsList() {
+      try {
+        const data = await fetchOperatorsList();  
+      } catch (error) {
+        console.error("Error fetching operators list:", error);
+      }
     }
-  }
 
-  getOperatorsList();
-})
+    getOperatorsList();
+  },[]);
   
   return (
     <div className="flex flex-col gap-4">
       {serviceGroups.map((g) => (
         <section key={g.title} className="rounded-2xl border border-border bg-surface p-4">
-          <div className="mb-3 flex items-center gap-2 px-1">
-            <span className="h-4 w-1 rounded-full" style={{ background: g.barColor }} />
+          <div className="mb-3 flex items-center gap-1 px-1">
+            {g.logo === true && (
+              <img src="/B-mnemonic.jpg" alt="Bharat Connect" className="h-6"/>
+            )}
             <h2 className="font-display text-[13px] font-semibold">{g.title}</h2>
-            {g.title === "Recharge and Bills" && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src="/bharat-connect.png" alt="Bharat Connect" className="ml-auto h-5 w-auto" />
+            {g.viewAll === true && (
+              <button
+                type="button"
+                onClick={() => setShowAllBills(true)}
+                className="ml-auto h-6 text-[11px] w-auto text-primary font-semibold hover:underline"
+              >
+                View All
+              </button>
             )}
           </div>
           <div className="grid grid-cols-4 gap-x-1 gap-y-3">
@@ -78,6 +84,8 @@ export function ServiceGrid() {
           </div>
         </section>
       ))}
+
+      {showAllBills && <BillPaymentsView onClose={() => setShowAllBills(false)} />}
     </div>
   );
 }
