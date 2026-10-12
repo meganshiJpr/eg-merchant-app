@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "home": "హోమ్",
+    "reports": "నివేదికలు",
+    "khaata": "ఖాతా",
+    "profile": "ప్రొఫైల్",
+    "scanPay": "స్కాన్ & పే"
+  },
+  "header": {
+    "walletBalance": "వాలెట్ నిల్వ"
+  },
+  "buttons": {
+    "submit": "సమర్పించు",
+    "cancel": "రద్దు చేయి",
+    "confirm": "స్థిరీకరించు",
+    "update": "అప్‌డేట్ చేయి",
+    "back": "వెనుకకు",
+    "close": "మూసివేయి"
+  },
+  "labels": {
+    "mpin": "M PIN",
+    "mobileNumber": "మొబైల్ సంఖ్య",
+    "accountNumber": "ఖాతా సంఖ్య",
+    "status": "స్థితి"
+  },
+  "status": {
+    "verified": "ధృవీకరించబడింది",
+    "processing": "ప్రక్రియలో ఉంది",
+    "rejected": "తిరస్కరించబడింది",
+    "pending": "పెండింగ్‌లో ఉంది",
+    "approved": "ఆమోదించబడింది"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "home": "முகப்பு",
+    "reports": "அறிக்கைகள்",
+    "khaata": "காதா",
+    "profile": "சுயவிவரம்",
+    "scanPay": "ஸ்கேன் & பே"
+  },
+  "header": {
+    "walletBalance": "வாலட் இருப்பு"
+  },
+  "buttons": {
+    "submit": "சமர்ப்பி",
+    "cancel": "ரத்துசெய்",
+    "confirm": "உறுதிசெய்",
+    "update": "புதுப்பி",
+    "back": "பின்செல்",
+    "close": "மூடு"
+  },
+  "labels": {
+    "mpin": "M PIN",
+    "mobileNumber": "மொபைல் எண்",
+    "accountNumber": "கணக்கு எண்",
+    "status": "நிலை"
+  },
+  "status": {
+    "verified": "சரிபார்க்கப்பட்டது",
+    "processing": "செயலாக்கத்தில் உள்ளது",
+    "rejected": "நிராகரிக்கப்பட்டது",
+    "pending": "நிலுவையில் உள்ளது",
+    "approved": "அங்கீகரிக்கப்பட்டது"
+  }
+}

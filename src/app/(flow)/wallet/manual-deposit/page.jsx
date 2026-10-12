@@ -156,7 +156,7 @@ export default function ManualDepositPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-page pb-24 text-text-1">
-      <SubHeader title="Manual Deposit" backHref="/wallet" />
+      <SubHeader title="Manual Deposit" backHref="/wallet" showImg={false}/>
 
       <div className="flex flex-col gap-4 p-4">
         {loading && (

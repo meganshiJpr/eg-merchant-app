@@ -8,6 +8,7 @@ import { fetchDepositHistory, fetchRequestBalance } from "@/features/reports/api
 import { ReportHeaderFilterBar } from "@/features/reports/components/ReportHeaderFilterBar";
 import { ReportFilterSheet } from "@/features/reports/components/ReportFilterSheet";
 import { inr } from "@/utils/format";
+import { useTranslation } from "react-i18next";
 import { formatRequestTime, generateMonthsList, getDateRange } from "@/utils/transaction";
  
 const DEPOSIT_STATUSES = [
@@ -20,6 +21,7 @@ const DEPOSIT_STATUSES = [
 export default function DepositsPage() {
   const toast = useToast((t) => t.show);
 
+  const { t } = useTranslation("errors")
   const [historyData, setHistoryData] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -341,8 +343,8 @@ export default function DepositsPage() {
                 <rect x="3" y="3" width="18" height="7" rx="2" fill="var(--teal)" />
               </svg>
             </div>
-            <h3 className="mt-3 text-[15px] font-bold text-text-1">No Deposits Found</h3>
-            <p className="mt-1 text-[12.5px] text-text-3">Try adjusting your search query or date filters.</p>
+            <h3 className="mt-3 text-[15px] font-bold text-text-1">{t("No Deposits Found")}</h3>
+            <p className="mt-1 text-[12.5px] text-text-3">{t("Filter_Query")}</p>
           </div>
         )}
 

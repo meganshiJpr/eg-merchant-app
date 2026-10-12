@@ -1,0 +1,35 @@
+{
+  "title": "মোবাইল রিচার্জ",
+  "numberEntry": {
+    "customerMobile": "গ্রাহকের মোবাইল নম্বর",
+    "searchPlaceholder": "নাম খুঁজুন বা নম্বর লিখুন",
+    "detecting": "অপারেটর এবং সার্কেল শনাক্ত করা হচ্ছে...",
+    "noMatch": "তালিকায় নেই — পুরো নম্বর টাইপ করুন",
+    "noContact": "কোনও কন্ট্যাক্ট পাওয়া যায়নি",
+    "myNumber": "আমার নম্বর",
+    "selfTag": "নিজের",
+    "recentTitle": "সাম্প্রতিক রিচার্জ",
+    "viewAll": "সব দেখুন",
+    "recentTag": "সাম্প্রতিক",
+    "allContact": "সমস্ত কন্ট্যাক্ট",
+    "contactTag": "কন্ট্যাক্ট",
+    "selectOperator": "অপারেটর নির্বাচন করুন",
+    "selectCircle": "সার্কেল নির্বাচন করুন",
+    "change": "পরিবর্তন"
+  },
+  "plans": {
+    "searchPlaceholder": "প্ল্যান মূল্য বা ডেটা খুঁজুন",
+    "validity": "মেয়াদ",
+    "data": "ডেটা",
+    "selectButton": "প্ল্যান বেছে নিন",
+    "allPlans": "সমস্ত প্ল্যান"
+  },
+  "payment": {
+    "title": "পেমেন্ট বিবরণ",
+    "mobileLabel": "মোবাইল নম্বর",
+    "operatorLabel": "অপারেটর",
+    "amountLabel": "পরিমাণ",
+    "payButton": "₹{{amount}} পরিশোধ করুন",
+    "payNow": "এখনই প্রদান করুন"
+  }
+}

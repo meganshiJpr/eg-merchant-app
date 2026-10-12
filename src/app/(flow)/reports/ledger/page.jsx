@@ -7,9 +7,11 @@ import { PaymentSuccessful } from "@/components/ui/PaymentSuccessful";
 import { ReportHeaderFilterBar } from "@/features/reports/components/ReportHeaderFilterBar";
 import { ReportFilterSheet } from "@/features/reports/components/ReportFilterSheet";
 import { inr } from "@/utils/format";
+import { useTranslation } from "react-i18next";
 import { formatRequestTime, generateMonthsList, getDateRange } from "@/utils/transaction";
 
 export default function LedgerPage() {
+  const { t } =  useTranslation("errors")
   const [activeReceiptData, setActiveReceiptData] = useState(null);
   const [fetchingDetailsId, setFetchingDetailsId] = useState(null);
 
@@ -243,8 +245,8 @@ export default function LedgerPage() {
                 <path d="M17 9V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2m2 4h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm7-5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
               </svg>
             </div>
-            <h3 className="mt-3 text-[15px] font-bold text-text-1">No Ledger Entries Found</h3>
-            <p className="mt-1 text-[12.5px] text-text-3">Try adjusting your search query or date filters.</p>
+            <h3 className="mt-3 text-[15px] font-bold text-text-1">{t("LEDGER_NOT_FOUND")}</h3>
+            <p className="mt-1 text-[12.5px] text-text-3">{t("Filter_Query")}</p>
           </div>
         )}
 

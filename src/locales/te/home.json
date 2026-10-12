@@ -1,0 +1,37 @@
+{
+  "title": "హోమ్",
+  "viewAll": "అన్నీ చూడండి",
+  "groups": {
+    "Recharges": "రీఛార్జ్‌లు",
+    "Bill Payments": "బిల్‌ చెల్లింపులు",
+    "Banking Services": "బ్యాంకింగ్ సేవలు",
+    "Business Tools": "వ్యాపార పరికరాలు",
+    "More Services": "మరిన్ని సేవలు"
+  },
+  "items": {
+    "mobile": "మొబైల్",
+    "dth": "DTH",
+    "subscription": "సబ్‌స్క్రిప్షన్",
+    "postpaid": "పోస్ట్‌పైడ్",
+    "lpg": "LPG గ్యాస్",
+    "creditcard": "క్రెడిట్ కార్డ్",
+    "loanrepayment": "రుణ చెల్లింపు",
+    "electricity": "విద్యుత్",
+    "water": "నీరు",
+    "gas": "గ్యాస్",
+    "fastag": "FASTag",
+    "aeps": "AEPS",
+    "dmt": "మనీ ట్రాన్స్‌ఫర్",
+    "aadhaarpay": "ఆధార్ పే",
+    "ministmt": "మిని స్టేట్‌మెంట్",
+    "cashdep": "నగదు డిపాజిట్",
+    "matm": "మైక్రో ATM",
+    "khaata": "ఖాతా బుక్",
+    "qr": "నా QR కోడ్",
+    "reports": "నివేదికలు",
+    "discount": "డిస్కౌంట్ చార్ట్",
+    "insurance": "ఇన్సూరెన్స్",
+    "pan": "పాన్ కార్డ్",
+    "travel": "బస్సు బుకింగ్"
+  }
+}

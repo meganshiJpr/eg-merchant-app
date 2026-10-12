@@ -21,8 +21,9 @@ const nextConfig = {
     return [
       {
         source: "/api-proxy/:path*",
-        destination: "https://staging.paybyapis.com/:path*",
-      },
+        // destination: "https://staging.paybyapis.com/:path*",
+        destination: "https://merchant.egpayment.com/:path*",
+      }, 
     ];
   },
 };

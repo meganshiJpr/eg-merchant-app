@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "home": "হোম",
+    "reports": "রিপোর্ট",
+    "khaata": "খাতা",
+    "profile": "প্রোফাইল",
+    "scanPay": "স্ক্যান ও পে"
+  },
+  "header": {
+    "walletBalance": "ওয়ালেট ব্যালেন্স"
+  },
+  "buttons": {
+    "submit": "জমা দিন",
+    "cancel": "বাতিল করুন",
+    "confirm": "নিশ্চিত করুন",
+    "update": "আপডেট করুন",
+    "back": "ফিরে যান",
+    "close": "বন্ধ করুন"
+  },
+  "labels": {
+    "mpin": "M PIN",
+    "mobileNumber": "মোবাইল নম্বর",
+    "accountNumber": "অ্যাকাউন্ট নম্বর",
+    "status": "স্ট্যাটাস"
+  },
+  "status": {
+    "verified": "যাচাইকৃত",
+    "processing": "প্রক্রিয়াকরণ চলছে",
+    "rejected": "প্রত্যাখ্যাত",
+    "pending": "পেন্ডিং",
+    "approved": "অনুমোদিত"
+  }
+}

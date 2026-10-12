@@ -1,5 +1,6 @@
 "use client";
 
+import "@/lib/i18n";
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { ToastHost } from "@/components/ui/Toast";

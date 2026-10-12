@@ -1,0 +1,37 @@
+{
+  "title": "முகப்பு",
+  "viewAll": "அனைத்தையும் காண்க",
+  "groups": {
+    "Recharges": "ரீசார்ஜ்கள்",
+    "Bill Payments": "பில் கட்டணங்கள்",
+    "Banking Services": "வங்கி சேவைகள்",
+    "Business Tools": "வணிக கருவிகள்",
+    "More Services": "கூடுதல் சேவைகள்"
+  },
+  "items": {
+    "mobile": "மொபைல்",
+    "dth": "DTH",
+    "subscription": "சந்தா",
+    "postpaid": "போஸ்ட்பெய்டு",
+    "lpg": "LPG கேஸ்",
+    "creditcard": "கிரெடிட் கார்டு",
+    "loanrepayment": "கடன் திருப்பிச் செலுத்துதல்",
+    "electricity": "மின்சாரம்",
+    "water": "குடிநீர்",
+    "gas": "கேஸ் பில்",
+    "fastag": "FASTag",
+    "aeps": "AEPS",
+    "dmt": "பணப் பரிமாற்றம்",
+    "aadhaarpay": "ஆதார் பே",
+    "ministmt": "மினி ஸ்டேட்மென்ட்",
+    "cashdep": "ரொக்க வைப்பு",
+    "matm": "மைக்ரோ ஏடிஎம்",
+    "khaata": "காதா புல்",
+    "qr": "எனது QR கோடு",
+    "reports": "அறிக்கைகள்",
+    "discount": "தள்ளுபடி அட்டவணை",
+    "insurance": "காப்பீடு",
+    "pan": "பான் கார்டு",
+    "travel": "பேருந்து முன்பதிவு"
+  }
+}

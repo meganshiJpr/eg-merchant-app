@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { useRecharge } from "../store";
 import { fetchOperatorPlan, fetchPrepaidPlans } from "../api";
 import { SelectedNumber } from "./SelectedNumber";
@@ -71,6 +72,7 @@ function HighlightText({ text, query }) {
 
 export function PlanSelectionView({ onEdit }) {
   const router = useRouter();
+  const { t } = useTranslation("recharge");
 
   // Stable Zustand selectors
   const num = useRecharge((state) => state.num);
@@ -322,7 +324,7 @@ useEffect(() => {
         <input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search plans (amount, data, OTT, validity...)"
+          placeholder={t("plans.searchPlaceholder")}
           className="w-full rounded-2xl border border-border bg-surface py-3 pl-10 pr-4 text-[13px] outline-none placeholder:text-text-3 focus:border-primary shadow-xs"
         />
       </div>
@@ -354,7 +356,7 @@ useEffect(() => {
         {loading ? (
           <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-xs">
             <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <span className="text-[13px] font-medium text-text-2">Detecting Plans...</span>
+            <span className="text-[13px] font-medium text-text-2">{t("plans.detecting", "Detecting Plans...")}</span>
           </div>
         ) : filteredPlans.length > 0 ? (
           filteredPlans.map((p, idx) => {
@@ -426,7 +428,7 @@ useEffect(() => {
                       <HighlightText text={voice} query={searchQuery} />
                     </div>
                     <div className="mt-0.5 text-[10.5px] font-medium text-text-3">
-                      Calls
+                      {t("plans.calls", "Calls")}
                     </div>
                   </div>
 
@@ -435,7 +437,7 @@ useEffect(() => {
                       <HighlightText text={sms} query={searchQuery} />
                     </div>
                     <div className="mt-0.5 text-[10.5px] font-medium text-text-3">
-                      SMS
+                      {t("plans.sms", "SMS")}
                     </div>
                   </div>
 
@@ -444,7 +446,7 @@ useEffect(() => {
                       <HighlightText text={data} query={searchQuery} />
                     </div>
                     <div className="mt-0.5 text-[10.5px] font-medium text-text-3">
-                      Data
+                      {t("plans.data", "Data")}
                     </div>
                   </div>
 
@@ -453,7 +455,7 @@ useEffect(() => {
                       <HighlightText text={val} query={searchQuery} />
                     </div>
                     <div className="mt-0.5 text-[10.5px] font-medium text-text-3">
-                      Validity
+                      {t("plans.validity", "Validity")}
                     </div>
                   </div>
                 </div>
@@ -507,7 +509,7 @@ useEffect(() => {
           })
         ) : (
           <div className="py-8 text-center text-[12.5px] text-text-3">
-            No plans found for the selected filter
+            {t("plans.noPlans", "No plans found for the selected filter")}
           </div>
         )}
       </div>
@@ -535,25 +537,25 @@ useEffect(() => {
                   <div className="text-[10px] leading-tight break-words min-h-[24px] font-extrabold text-text-1">
                     <HighlightText text={sheetPlan.voice || sheetPlan.calls || "-"} query={searchQuery} />
                   </div>
-                  <div className="mt-0.5 text-[10.5px] font-medium text-text-3">Calls</div>
+                  <div className="mt-0.5 text-[10.5px] font-medium text-text-3">{t("plans.calls", "Calls")}</div>
                 </div>
                 <div className="px-1 min-w-0">
                   <div className="break-words min-h-[24px] text-[10px] leading-tight font-extrabold text-text-1">
                     <HighlightText text={sheetPlan.sms || "-"} query={searchQuery} />
                   </div>
-                  <div className="mt-0.5 text-[11px] min-h-[24px] break-words leading-tight font-medium text-text-3">SMS</div>
+                  <div className="mt-0.5 text-[11px] min-h-[24px] break-words leading-tight font-medium text-text-3">{t("plans.sms", "SMS")}</div>
                 </div>
                 <div className="px-1 min-w-0">
                   <div className="text-[10px] font-extrabold text-text-1 break-words leading-tight min-h-[24px]">
                     <HighlightText text={sheetPlan.data || "-"} query={searchQuery} />
                   </div>
-                  <div className="mt-0.5 text-[10.5px] font-medium text-text-3">Data</div>
+                  <div className="mt-0.5 text-[10.5px] font-medium text-text-3">{t("plans.data", "Data")}</div>
                 </div>
                 <div className="px-1 min-w-0">
                   <div className="text-[10px] font-extrabold text-text-1 break-words leading-tight min-h-[24px]">
                     <HighlightText text={sheetPlan.validity || sheetPlan.val || "-"} query={searchQuery} />
                   </div>
-                  <div className="mt-0.5 text-[10.5px] font-medium text-text-3">Validity</div>
+                  <div className="mt-0.5 text-[10.5px] font-medium text-text-3">{t("plans.validity", "Validity")}</div>
                 </div>
               </div>
 
@@ -606,7 +608,7 @@ useEffect(() => {
                 }}
                 className="w-full rounded-xl bg-primary px-4 py-3.5 font-display text-[14px] font-bold text-white shadow-xs active:scale-[0.985] transition"
               >
-                Select This Plan
+                {t("plans.selectButton", "Select Plan")}
               </button>
             </div>
           </div>

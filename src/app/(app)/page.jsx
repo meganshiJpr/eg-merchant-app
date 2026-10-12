@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ServiceGrid } from "@/features/home/ServiceGrid";
 import { useDashboard } from "@/features/dashboard/hooks/useDashboard";
 import { BottomBannerSheet } from "@/features/home/components/BottomBannerSheet";
+import { KycStepBanner } from "@/features/dashboard/components/KycStepBanner";
 
 export default function HomePage() {
   const { data: dashboardData, isLoading } = useDashboard();
@@ -69,8 +70,8 @@ export default function HomePage() {
         </div>
       ) : null}
 
-      {/* KYC banner */}
-     
+      {/* KYC complete step bar */}
+      <KycStepBanner />
 
       <ServiceGrid />
       <BottomBannerSheet/>

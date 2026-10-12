@@ -20,6 +20,16 @@ export const useAuthStore = create(
       merchant: null,
       hydrated: false,
       setSession: (token, merchant, device = null) => set({ token, merchant, device }),
+      updateKycCompleted: (isCompleted) =>
+        set((state) => ({
+          merchant: state.merchant
+            ? {
+                ...state.merchant,
+                isKycCompleted: isCompleted,
+                kycStatus: isCompleted ? "verified" : "pending",
+              }
+            : null,
+        })),
       clear: () => set({ token: null, device: null, merchant: null }),
       setHydrated: () => set({ hydrated: true }),
     }),

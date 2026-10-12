@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { getMerchantMobile, formatRechargeDate, STATIC_CONTACTS } from "../data";
 import { useRecharge } from "../store";
 import { fetchOperatorsList } from "@/features/dashboard/api";
@@ -31,6 +32,7 @@ function getSessionOperatorsData() {
 }
 
 export function NumberEntry({ historyData, onDetected }) {
+  const { t } = useTranslation("recharge");
   const setFlow = useRecharge((state) => state.set);
   const [value, setValue] = useState("");
 
@@ -80,7 +82,7 @@ export function NumberEntry({ historyData, onDetected }) {
 
   const basePath = sessionData?.operator_img || "https://staging.paybyapis.com/images/operators/";
 
-    const hasFetchedRef = useRef(false);
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
    if (hasFetchedRef.current) return;
@@ -230,7 +232,7 @@ export function NumberEntry({ historyData, onDetected }) {
     if (!q || "my number".includes(q) || cleanMerchant.includes(q)) {
       return [
         {
-          name: "My Number",
+          name: t("numberEntry.myNumber"),
           num: merchantMobile,
           subtitle: myNumberSubtitle,
           tag: "self",
@@ -239,7 +241,7 @@ export function NumberEntry({ historyData, onDetected }) {
       ];
     }
     return [];
-  }, [value, merchantMobile, myNumberSubtitle]);
+  }, [value, merchantMobile, myNumberSubtitle, t]);
 
   const filteredRecents = useMemo(() => {
     const q = value.trim().toLowerCase();
@@ -395,7 +397,7 @@ export function NumberEntry({ historyData, onDetected }) {
   return (
     <div>
       {/* Searchbar Input */}
-      <div className="mb-2.5 text-[12.5px] font-semibold text-text-2">Customer mobile number</div>
+      <div className="mb-2.5 text-[12.5px] font-semibold text-text-2">{t("numberEntry.customerMobile")}</div>
       <div className="flex items-center gap-2 rounded-xl border-[1.5px] border-border bg-surface px-3.5 py-3 focus-within:border-primary">
         <span className="mono text-[14px] font-medium text-text-3">+91</span>
         <input
@@ -403,7 +405,7 @@ export function NumberEntry({ historyData, onDetected }) {
           onChange={(e) => onInput(e.target.value)}
           inputMode="numeric"
           maxLength={11}
-          placeholder="Search name or enter number"
+          placeholder={t("numberEntry.searchPlaceholder")}
           className="mono min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:font-body placeholder:text-text-3"
         />
         <svg viewBox="0 0 24 24" className="h-5 w-5 fill-text-3">
@@ -411,10 +413,10 @@ export function NumberEntry({ historyData, onDetected }) {
         </svg>
       </div>
 
-      {detecting  || isDetectingOrComplete ? (
+      {detecting || isDetectingOrComplete ? (
         <div className="mt-4 flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3.5 shadow-xs">
           <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <span className="text-[13px] font-medium text-text-2">Detecting operator and circle...</span>
+          <span className="text-[13px] font-medium text-text-2">{t("numberEntry.detecting")}</span>
         </div>
       ) : detectError ? (
         <div className="mt-4 text-center text-[12.5px] font-semibold text-rose-500">
@@ -422,11 +424,11 @@ export function NumberEntry({ historyData, onDetected }) {
         </div>
       ) : isOverflow ? (
         <div className="mt-6 text-center text-[13px] font-semibold text-text-3">
-          No contact found
+          {t("numberEntry.noContact")}
         </div>
       ) : hasNoMatch ? (
         <div className="mt-12 text-center text-[13px] font-medium text-text-3">
-          No match in your list — keep typing the full number
+          {t("numberEntry.noMatch")}
         </div>
       ) : (
         <div className="mt-3 flex flex-col gap-4">
@@ -453,7 +455,7 @@ export function NumberEntry({ historyData, onDetected }) {
                     )}
                   </div>
                   <span className="flex-none rounded-full bg-primary-soft px-2.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-primary">
-                    SELF
+                    {t("numberEntry.selfTag")}
                   </span>
                 </div>
               ))}
@@ -464,8 +466,8 @@ export function NumberEntry({ historyData, onDetected }) {
           {filteredRecents.length > 0 && (
             <div>
               <div className="mb-2 flex items-center justify-between px-1">
-                <span className="font-display text-[13px] font-bold text-text-1">Recent Recharges</span>
-                <button className="text-[12px] font-bold text-primary">View all</button>
+                <span className="font-display text-[13px] font-bold text-text-1">{t("numberEntry.recentTitle")}</span>
+                <button className="text-[12px] font-bold text-primary">{t("numberEntry.viewAll")}</button>
               </div>
 
               <div className="flex flex-col gap-2">
@@ -511,7 +513,7 @@ export function NumberEntry({ historyData, onDetected }) {
                     </span>
 
                     <span className="flex-none rounded-full bg-teal-soft px-2.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-teal">
-                      RECENT
+                      {t("numberEntry.recentTag")}
                     </span>
                   </button>
                 ))}
@@ -522,7 +524,7 @@ export function NumberEntry({ historyData, onDetected }) {
           {/* 3. ALL CONTACTS SECTION */}
           {filteredContacts.length > 0 && (
             <div>
-              <div className="mb-2 px-1 font-display text-[13px] font-bold text-text-1">All Contact</div>
+              <div className="mb-2 px-1 font-display text-[13px] font-bold text-text-1">{t("numberEntry.allContact")}</div>
 
               <div className="flex flex-col gap-2">
                 {filteredContacts.map((s, idx) => (
@@ -554,7 +556,7 @@ export function NumberEntry({ historyData, onDetected }) {
                     </span>
 
                     <span className="flex-none rounded-full border border-border bg-page px-2.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-text-3">
-                      CONTACT
+                      {t("numberEntry.contactTag")}
                     </span>
                   </button>
                 ))}
@@ -569,7 +571,7 @@ export function NumberEntry({ historyData, onDetected }) {
         {step === 1 ? (
           /* STEP 1: SELECT OPERATOR */
           <div className="flex flex-col gap-4 py-2">
-            <h2 className="font-display text-[16px] font-bold text-text-1">Select operator</h2>
+            <h2 className="font-display text-[16px] font-bold text-text-1">{t("numberEntry.selectOperator")}</h2>
 
             <div className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto no-scrollbar">
               {prepaidOps.map((op) => {
@@ -623,7 +625,7 @@ export function NumberEntry({ historyData, onDetected }) {
           /* STEP 2: SELECT CIRCLE */
           <div className="flex flex-col gap-4 py-2">
             <div>
-              <h2 className="font-display text-[16px] font-bold text-text-1">Select circle</h2>
+              <h2 className="font-display text-[16px] font-bold text-text-1">{t("numberEntry.selectCircle")}</h2>
               <button
                 onClick={() => setStep(1)}
                 className="mt-1 flex items-center gap-1 text-[12.5px] font-semibold text-primary"
@@ -631,7 +633,7 @@ export function NumberEntry({ historyData, onDetected }) {
                 <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 fill-primary">
                   <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
                 </svg>
-                {selectedOp?.name || "Operator"} selected · change
+                {selectedOp?.name || "Operator"} selected · {t("numberEntry.change")}
               </button>
             </div>
 

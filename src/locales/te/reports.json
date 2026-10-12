@@ -1,0 +1,24 @@
+{
+  "title": "నివేదికలు",
+  "main": {
+    "transactionsHeader": "లావాదేవీలు",
+    "transactionsSub": "అన్ని రీఛార్జ్‌లు మరియు బిల్ చెల్లింపులు",
+    "disputesTitle": "ఫర్యాదులు & వివాదాలు",
+    "disputesSub": "నమోదు చేసిన ఫర్యాదులు మరియు వాటి స్థితి",
+    "accountHeader": "ఖాతా",
+    "ledgerTitle": "వాలెట్ లెడ్జర్",
+    "ledgerSub": "మీ వాలెట్‌లోని ప్రతి క్రెడిట్ మరియు డెబిట్",
+    "depositsTitle": "డిపాజిట్ నివేదికలు",
+    "depositsSub": "UPI ద్వారా ఆన్‌లైన్ వాలెట్ టాప్-అప్‌లు",
+    "manualDepositsTitle": "మాన్యువల్ డిపాజిట్ అభ్యర్థనలు",
+    "manualDepositsSub": "మీ డిపాజిట్ అభ్యర్థనల స్థితి",
+    "refundReportTitle": "రీఫండ్ నివేదిక",
+    "refundReportSub": "విఫలమైన లావాదేవీ రీఫండ్‌లు"
+  },
+  "filters": {
+    "title": "ఫిల్టర్ నివేదికలు",
+    "apply": "ఫిల్టర్‌లను వర్తింపజేయండి",
+    "reset": "రీసెట్ చేయండి",
+    "searchPlaceholder": "కీవర్డ్ / ఆర్డర్ ID ద్వారా శోధించండి"
+  }
+}

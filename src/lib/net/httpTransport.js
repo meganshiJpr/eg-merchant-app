@@ -13,7 +13,10 @@ export class HttpTransport {
   async send(req) {
     const { body, headers: codecHeaders } = await this.codec.encode(req.body);
 
-    const res = await fetch(`${this.baseUrl}${req.path}`, {
+    const base = req.baseUrl || this.baseUrl;
+    const url = `${base.replace(/\/$/, "")}/${req.path.replace(/^\//, "")}`;
+
+    const res = await fetch(url, {
       method: req.method,
       signal: req.signal,
       headers: {

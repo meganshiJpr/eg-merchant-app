@@ -1,0 +1,35 @@
+{
+  "title": "Mobile Recharge",
+  "numberEntry": {
+    "customerMobile": "Customer mobile number",
+    "searchPlaceholder": "Search name or enter number",
+    "detecting": "Detecting operator and circle...",
+    "noMatch": "No match in your list — keep typing the full number",
+    "noContact": "No contact found",
+    "myNumber": "My Number",
+    "selfTag": "SELF",
+    "recentTitle": "Recent Recharges",
+    "viewAll": "View all",
+    "recentTag": "RECENT",
+    "allContact": "All Contact",
+    "contactTag": "CONTACT",
+    "selectOperator": "Select operator",
+    "selectCircle": "Select circle",
+    "change": "change"
+  },
+  "plans": {
+    "searchPlaceholder": "Search plan amount or data",
+    "validity": "Validity",
+    "data": "Data",
+    "selectButton": "Select Plan",
+    "allPlans": "All Plans"
+  },
+  "payment": {
+    "title": "Payment Details",
+    "mobileLabel": "Mobile Number",
+    "operatorLabel": "Operator",
+    "amountLabel": "Amount",
+    "payButton": "Pay ₹{{amount}}",
+    "payNow": "Pay Now"
+  }
+}

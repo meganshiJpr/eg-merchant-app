@@ -8,10 +8,12 @@ import { inr } from "@/utils/format";
 import { formatRequestTime, getCategoriesFromSession, generateMonthsList, getDateRange } from "@/utils/transaction";
 import { ReportHeaderFilterBar } from "@/features/reports/components/ReportHeaderFilterBar";
 import { ReportFilterSheet } from "@/features/reports/components/ReportFilterSheet";
+import { useTranslation } from "react-i18next";
 
 
 export default function TransactionsPage() {
 
+  const { t } = useTranslation("errors")
   const [activeReceiptData, setActiveReceiptData] = useState(null);
   const [fetchingDetailsId, setFetchingDetailsId] = useState(null);
   const [historyData, setHistoryData] = useState([]);
@@ -229,7 +231,7 @@ console.log("Loading transactions with payload:", payload);
   return (
     <div className="min-h-screen bg-[#f4f5fa] pb-24 max-w-app mx-auto text-text-1">
       {/* HEADER */}
-      <SubHeader title="Transactions History" backHref="/reports" showImg={false} />
+      <SubHeader title="Transactions History" backHref="/reports" />
 
       <div className="p-4 space-y-4">
         {/* Common Search Bar & Date Quick Tabs */}
@@ -274,8 +276,8 @@ console.log("Loading transactions with payload:", payload);
                 <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
             </div>
-            <h3 className="mt-3 text-[15px] font-bold text-text-1">No Transactions Found</h3>
-            <p className="mt-1 text-[12.5px] text-text-3">Try adjusting your search query or filters.</p>
+            <h3 className="mt-3 text-[15px] font-bold text-text-1">{t("TRANSACTION_NOT_FOUND")}</h3>
+            <p className="mt-1 text-[12.5px] text-text-3">{t("Filter_Query")}</p>
           </div>
         )}
 

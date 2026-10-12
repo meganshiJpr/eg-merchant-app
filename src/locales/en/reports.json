@@ -1,0 +1,24 @@
+{
+  "title": "Reports",
+  "main": {
+    "transactionsHeader": "Transactions",
+    "transactionsSub": "All recharges and bill payments",
+    "disputesTitle": "Disputes & Complaints",
+    "disputesSub": "Raised complaints and their status",
+    "accountHeader": "Account",
+    "ledgerTitle": "Wallet Ledger",
+    "ledgerSub": "Every credit and debit in your wallet",
+    "depositsTitle": "Deposit Reports",
+    "depositsSub": "Online wallet top-ups via UPI",
+    "manualDepositsTitle": "Manual Deposit Requests",
+    "manualDepositsSub": "Status of your deposit requests",
+    "refundReportTitle": "Refund Report",
+    "refundReportSub": "Failed transaction refunds"
+  },
+  "filters": {
+    "title": "Filter Reports",
+    "apply": "Apply Filters",
+    "reset": "Reset",
+    "searchPlaceholder": "Search by Keyword / Order ID"
+  }
+}

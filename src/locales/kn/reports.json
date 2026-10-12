@@ -1,0 +1,24 @@
+{
+  "title": "ವರದಿಗಳು",
+  "main": {
+    "transactionsHeader": "ವಹಿವಾಟುಗಳು",
+    "transactionsSub": "ಎಲ್ಲಾ ರೀಚಾರ್ಜ್‌ಗಳು ಮತ್ತು ಬಿಲ್ ಪಾವತಿಗಳು",
+    "disputesTitle": "ದೂರುಗಳು & ವಿವಾದಗಳು",
+    "disputesSub": "ಸಲ್ಲಿಸಿದ ದೂರುಗಳು ಮತ್ತು ಅವುಗಳ ಸ್ಥಿತಿ",
+    "accountHeader": "ಖಾತೆ",
+    "ledgerTitle": "ವಾಲೆಟ್ ಲೆಡ್ಜರ್",
+    "ledgerSub": "ನಿಮ್ಮ ವಾಲೆಟ್‌ನಲ್ಲಿರುವ ಪ್ರತಿಯೊಂದು ಜಮಾ ಮತ್ತು ಖರ್ಚು",
+    "depositsTitle": "ಠೇವಣಿ ವರದಿಗಳು",
+    "depositsSub": "UPI ಮೂಲಕ ಆನ್‌ಲೈನ್ ವಾಲೆಟ್ ಟಾಪ್-ಅಪ್‌ಗಳು",
+    "manualDepositsTitle": "ಮ್ಯಾನುಯಲ್ ಠೇವಣಿ ವಿನಂತಿಗಳು",
+    "manualDepositsSub": "ನಿಮ್ಮ ಠೇವಣಿ ವಿನಂತಿಗಳ ಸ್ಥಿತಿ",
+    "refundReportTitle": "ರೀಫಂಡ್ ವರದಿ",
+    "refundReportSub": "ವಿಫಲವಾದ ವಹಿವಾಟಿನ ರೀಫಂಡ್‌ಗಳು"
+  },
+  "filters": {
+    "title": "ವರದಿಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ",
+    "apply": "ಫಿಲ್ಟರ್‌ಗಳನ್ನು ಅನ್ವಯಿಸಿ",
+    "reset": "ರಿಸೆಟ್ ಮಾಡಿ",
+    "searchPlaceholder": "ಕೀವರ್ಡ್ / ಆರ್ಡರ್ ID ಮೂಲಕ ಹುಡುಕಿ"
+  }
+}

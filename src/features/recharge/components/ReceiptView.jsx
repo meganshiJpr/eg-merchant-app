@@ -117,6 +117,7 @@ export function ReceiptView() {
     };
   }, [receipt, paymentDetails, plan, flow.num, flow.account, flow.session_id, flow.operatorPlanSessionId, flow.operator, flow.circle, flow.serviceType, flow.categoryType, flow.amount, flow.billAmount, flow.set]);
 
+  console.log("response of the receiept view screnn",flow.paymentDetails)
   // 1. COMPLETED RECEIPT SCREEN (When transaction finishes from PayScreen)
   if (receipt) {
     const isSuccess = receipt.status === "success" || receipt.status === "processing";
@@ -228,6 +229,9 @@ export function ReceiptView() {
     flow.circle || details.circle
   );
 
+  const descriptive = paymentDetails?.pg_split_payments?.description || "";
+
+  const descriptionParts = descriptive.split(/(<b>.*?<\/b>)/g);
   const operator = flow.operatorName || details.operator_name || resolved.operatorName || (flow.serviceType || flow.categoryType || "Prepaid");
   const circle = flow.circleName || details.circle_name || resolved.circleName || "India";
   const logo = flow.operatorLogo || resolved.operatorLogo;
@@ -239,7 +243,7 @@ export function ReceiptView() {
   const planAmount = Number(plan?.rs || plan?.amt || amount || 0);
   const perDayCost = plan ? (plan.per_day_cost || (planAmount / Number(plan.validity || plan.val || 28)).toFixed(1)) : 0;
   const dailyPrice = Number(perDayCost);
-
+  
   const validity = plan?.validity || plan?.val || plan?.validityDays || "-";
   const data = plan?.data || plan?.dataBenefit || "-";
   const calls = plan?.calls || plan?.voice || "-";
@@ -282,8 +286,9 @@ export function ReceiptView() {
         convenienceFee: "Rs 0.00",
         billAmount: finalAmount,
         totalAmount: finalAmount,
+        logo:logo,
         dateTime: new Date().toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" }),
-        initiatingChannel: "Agent App",
+        // initiatingChannel: "Agent App",
         rows: [
           { k: "Operator", v: operator },
           { k: "Category", v: flow.serviceType || "Recharge" },
@@ -296,6 +301,8 @@ export function ReceiptView() {
       },
     });
   };
+
+  
 
 
   return (
@@ -400,6 +407,7 @@ export function ReceiptView() {
                 <div className="mono mt-0.5 text-[13px] font-semibold text-text-1">Rs {details?.ledger_amount}</div>
                 <div className="text-text-3 font-small text-[12px]">{details?.message}</div>
               </div>
+
             </div>
 
             <button
@@ -439,7 +447,7 @@ export function ReceiptView() {
               ))}
             </div>
 
-            {/* Expanded Extra Fields */}
+            {/* Expanded Extra Fields */} 
             {expandedCustomerCard && validBilldataRows.length > 4 && (
               <div className="grid grid-cols-2 gap-y-3 gap-x-4 pt-3 text-[12px]">
                 {validBilldataRows.slice(4).map((r) => (
@@ -532,6 +540,108 @@ export function ReceiptView() {
             </span>
           </div>
         </div>
+
+          {/* Avoid UPI Charges Card */}
+          <div className="mt-3 rounded-2xl border border-amber-300 bg-[#FFF9E6] p-3.5 shadow-xs">
+            {/* Top Banner Header */}
+            <div className="flex items-start gap-2.5">
+              <div className="flex h-6 w-6 flex-none items-center justify-center rounded-full bg-orange-500 font-bold text-white text-[13px] shadow-xs mt-0.5">
+                !
+              </div>
+              <div>
+              <div
+                className="text-[13.5px] font-bold"
+                dangerouslySetInnerHTML={{
+                  __html: paymentDetails?.pg_split_payments?.title || "",
+                }}
+              />
+              <p className="mt-0.5 text-[12px] leading-snug text-[#BA893C]">
+                {descriptionParts.map((part, index) =>
+                  part.startsWith("<b>") ? (
+                    <strong key={index} className="font-bold text-gray-900">
+                      {part.replace(/<\/?b>/g, "")}
+                    </strong>
+                  ) : (
+                    part
+                  )
+                )}
+              </p>
+              </div>
+            </div>
+
+            {/* Inner White Card */}
+            <div className="mt-3 rounded-xl border border-amber-200/60 bg-white p-3 shadow-2xs">
+              <div className="flex items-center gap-1.5 text-[12px] font-bold text-gray-800">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 stroke-gray-700 fill-none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="8" y1="6" x2="21" y2="6" />
+                  <line x1="8" y1="12" x2="21" y2="12" />
+                  <line x1="8" y1="18" x2="21" y2="18" />
+                  <line x1="3" y1="6" x2="3.01" y2="6" />
+                  <line x1="3" y1="12" x2="3.01" y2="12" />
+                  <line x1="3" y1="18" x2="3.01" y2="18" />
+                </svg>
+                <span>How your payment gets split</span>
+              </div>
+
+            <div className="mt-2.5 space-y-2 text-[12.5px]">
+              {paymentDetails?.pg_split_payments?.payments?.map((payment, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between"
+                >
+                  <span className="font-medium text-gray-600">
+                    {payment.title}
+                  </span>
+
+                  <span className="mono font-semibold text-gray-900">
+                    {payment.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {paymentDetails?.pg_split_payments?.savings && (
+              <div className="mt-2.5 flex items-center justify-between rounded-lg bg-green-50 px-2.5 py-1.5 text-[12px]">
+                <span className="flex items-center gap-1 font-semibold text-green-700">
+                  {paymentDetails.pg_split_payments.savings.title}
+                </span>
+
+                <span className="font-bold text-green-700">
+                  {paymentDetails.pg_split_payments.savings.value}
+                </span>
+              </div>
+            )}
+            </div>
+
+            {/* Action Button */}
+            <button
+              type="button"
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 px-4 py-3 text-[13px] font-bold text-white shadow-md active:scale-[0.985] transition"
+            >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 28 28"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="14"
+                cy="14"
+                r="12"
+                stroke="white"
+                strokeWidth="2"
+              />
+              <path
+                d="M14 9V19M9 14H19"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+              <span>{paymentDetails?.pg_split_payments?.button_text}</span>
+            </button>
+          </div>
       </div>
 
       {/* Bottom Payment Button */}

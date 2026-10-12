@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "home": "होम",
+    "reports": "रिपोर्ट्स",
+    "khaata": "खाता",
+    "profile": "प्रोफाइल",
+    "scanPay": "स्कैन और पे"
+  },
+  "header": {
+    "walletBalance": "वॉलेट बैलेंस"
+  },
+  "buttons": {
+    "submit": "सबमिट करें",
+    "cancel": "रद्द करें",
+    "confirm": "पुष्टि करें",
+    "update": "अपडेट करें",
+    "back": "वापस जाएं",
+    "close": "बंद करें"
+  },
+  "labels": {
+    "mpin": "एम पिन",
+    "mobileNumber": "मोबाइल नंबर",
+    "accountNumber": "खाता संख्या",
+    "status": "स्थिति"
+  },
+  "status": {
+    "verified": "सत्यापित",
+    "processing": "प्रक्रिया में",
+    "rejected": "अस्वीकृत",
+    "pending": "लंबित",
+    "approved": "स्वीकृत"
+  }
+}

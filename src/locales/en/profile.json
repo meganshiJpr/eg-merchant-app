@@ -1,0 +1,112 @@
+{
+  "title": "Profile",
+  "sections": {
+    "account": "Account",
+    "security": "Security",
+    "appSettings": "App Settings",
+    "support": "Support & Help"
+  },
+  "menu": {
+    "personalDetails": "Personal & Shop Details",
+    "shopDetails": "Shop Details",
+    "shopDetailsSub": "Shop name, address, GST",
+    "personalDetailsSub": "Name, business, address, GST",
+    "banksUpi": "Bank Accounts & UPI",
+    "banksUpiSub": "Settlement banks & VPA handles",
+    "kycDocs": "KYC Documents",
+    "kycDocsSub": "Aadhaar, PAN, Video KYC",
+    "changeMpin": "Change M PIN",
+    "changeMpinSub": "Update your 4-digit transaction PIN",
+    "resetMpinOtp": "Reset M Pin by OTP",
+    "resetMpinOtpSub": "Reset transaction PIN using mobile OTP",
+    "DarkMode": "Dark Mode",
+    "appLanguage": "App Language",
+    "appLanguageSub": "English / हिंदी",
+    "Help & Support": "Help & Support",
+    "HelpSupportSub":"FAQs,Call,Whatsapp",
+    "complaints": "Complaint Registration",
+    "complaintsSub": "Raise and track support tickets",
+    "transactionHistory": "Transaction History",
+    "transactionHistorySub": "History of your transactions"
+  },
+  "changePin": {
+    "title": "Change MPIN",
+    "currentMpin": "Current MPIN",
+    "newMpin": "New MPIN",
+    "confirmMpin": "Confirm New MPIN",
+    "submitButton": "Update MPIN",
+    "submitting": "Updating...",
+    "errLength": "All PINs must be 4 digits.",
+    "errMismatch": "New PIN and confirmation do not match.",
+    "errSame": "New PIN must be different from the current one."
+  },
+  "resetPin": {
+    "title": "Enter OTP",
+    "otpSentSubtitle": "OTP sent to your mobile number",
+    "resendOtp": "Resend OTP",
+    "sendingOtp": "Sending OTP...",
+    "newMpin": "New M Pin",
+    "confirmMpin": "Confirm M Pin",
+    "submitButton": "Set M Pin",
+    "submitting": "Setting MPIN...",
+    "errOtpLength": "Please enter the 6-digit OTP."
+  },
+  "banks": {
+    "title": "Bank Accounts",
+    "subtitle":"Settlement account",
+    "loading": "Loading bank accounts...",
+    "empty": "No bank accounts added yet.",
+    "addBankButton": "+ Add bank account",
+    "sheetTitle": "Add bank account",
+    "holderLabel": "Account holder name",
+    "acctLabel": "Account number",
+    "bankNameLabel": "Bank name",
+    "ifscLabel": "IFSC code",
+    "accountTypeLabel": "Account type",
+    "current": "Current",
+    "savings": "Savings",
+    "submitButton": "Add account",
+    "submitting": "Submitting..."
+  },
+  "upi": {
+    "title": "UPI Details",
+    "addUpiButton": "+ Add new UPI",
+    "sheetTitle": "Add UPI ID",
+    "holderLabel": "Account Holder Name",
+    "vpaLabel": "VPA / UPI ID",
+    "submitButton": "Add UPI ID"
+  },
+  "languageSheet": {
+    "title": "Select App Language",
+    "subtitle": "Choose your preferred language for the app interface"
+  },
+  "kycVerified": "KYC Verified",
+  "kycReview": "KYC Under Review",
+  "kycPending": "KYC Pending",
+  "merchantId": "Merchant ID",
+  "logoutModal": {
+    "title": "Log out?",
+    "description": "You will need your mobile number and OTP to log back in.",
+    "confirm": "Log out",
+    "loggedOut": "Logged out"
+  },
+  "supportPage": {
+    "title": "Help & Support",
+    "callUs": "Call us",
+    "whatsapp": "WhatsApp",
+    "raiseTicket": "Raise ticket",
+    "trackIssues": "Track issues",
+    "supportHours": "Support hours:",
+    "commonQuestions": "Common Questions",
+    "faqs": {
+      "q1": "Money deducted but transaction failed?",
+      "a1": "If money was debited for a failed transaction, it is typically refunded automatically to your wallet or bank account within 24 to 48 hours. You can also raise a ticket to track the issue status.",
+      "q2": "Manual deposit not credited yet?",
+      "a2": "Manual bank deposits are verified and processed within 30 to 60 minutes during operational hours. Please verify that your UTR / Reference ID was entered accurately.",
+      "q3": "How to change settlement bank account?",
+      "a3": "Go to Profile > Bank Accounts & UPI. You can add a new bank account or request changes to your primary settlement account.",
+      "q4": "Forgot transaction PIN?",
+      "a4": "You can instantly reset your 4-digit MPIN using mobile OTP verification under Profile > Reset M Pin by OTP."
+    }
+  }
+}

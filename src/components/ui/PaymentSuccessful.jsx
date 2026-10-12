@@ -109,7 +109,7 @@ export function PaymentSuccessful({ receiptData, onClose, playSound = true }) {
   addRow(2, "Amount Debited", finalCharge > 0 ? `₹${inr(finalCharge)}` : (rawAmount > 0 ? `₹${formattedAmount}` : null), { mono: true, bold: true });
   addRow(2, "Discount", discount > 0 ? `₹${inr(discount)}` : null, { mono: true });
   addRow(2, "Total Amount", receiptData?.totalAmount ? `₹${inr(Number(receiptData.totalAmount))}` : null, { mono: true });
-  addRow(2, "Initiating Channel", receiptData?.initiatingChannel);
+  // addRow(2, "Initiating Channel", receiptData?.initiatingChannel);
   // addRow(2, "Transaction Status", receiptData?.status ? String(receiptData.status).toUpperCase() : null, { statusGreen: true });
 
   // Dynamically include any additional customerInfo properties if present
@@ -214,7 +214,8 @@ export function PaymentSuccessful({ receiptData, onClose, playSound = true }) {
           className={`flex h-16 w-16 items-center justify-center rounded-full text-emerald-600 shadow-sm transition-all duration-700 ease-out transform`}
         >
           <img
-            src={`${receiptData?.logo_path}/${receiptData?.logo}`}
+            src={`${receiptData?.logo_path}/${receiptData?.logo} ?? ${receiptData?.logo}`}
+            //  src={`${receiptData?.logo}`}
             alt="Operator Logo"
             className=" rounded-full object-contain"
           />

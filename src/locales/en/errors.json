@@ -1,0 +1,13 @@
+{
+  "INVALID_MPIN": "Invalid M PIN!",
+  "SESSION_EXPIRED": "Session expired. Please log in again.",
+  "NETWORK": "Network error. Please check your connection.",
+  "GENERIC_FAILED": "Request failed. Please try again.",
+  "TRANSACTION_NOT_FOUND": "No Transactions Found",
+  "COMPLAINTS_NOT_FOUND":"No Complaints Found",
+  "LEDGER_NOT_FOUND":"No Ledger Entries Found",
+  "DEPOSITS_NOT_FOUND":"No Deposits Found",
+  "MANUAL_DEPOSITS":"No Deposit Requests Found",
+  "REFUND_REQUESTS":"No Refund Records Found",
+  "Filter_Query" : "Try adjusting your search query or data filters"
+}

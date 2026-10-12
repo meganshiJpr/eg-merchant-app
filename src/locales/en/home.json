@@ -1,0 +1,37 @@
+{
+  "title": "Home",
+  "viewAll": "View All",
+  "groups": {
+    "Recharges": "Recharges",
+    "Bill Payments": "Bill Payments",
+    "Banking Services": "Banking Services",
+    "Business Tools": "Business Tools",
+    "More Services": "More Services"
+  },
+  "items": {
+    "mobile": "Mobile",
+    "dth": "DTH",
+    "subscription": "Subscription",
+    "postpaid": "Postpaid",
+    "lpg": "LPG",
+    "creditcard": "Credit Card",
+    "loanrepayment": "Loan Repayment",
+    "electricity": "Electricity",
+    "water": "Water",
+    "gas": "Gas",
+    "fastag": "FASTag",
+    "aeps": "AEPS",
+    "dmt": "Money Transfer",
+    "aadhaarpay": "Aadhaar Pay",
+    "ministmt": "Mini Statement",
+    "cashdep": "Cash Deposit",
+    "matm": "Micro ATM",
+    "khaata": "Khaata Book",
+    "qr": "My QR Code",
+    "reports": "Reports",
+    "discount": "Discount Chart",
+    "insurance": "Insurance",
+    "pan": "PAN Card",
+    "travel": "Bus Booking"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "title": "ഹോം",
+  "viewAll": "എല്ലാം കാണുക",
+  "groups": {
+    "Recharges": "റീചാർജുകൾ",
+    "Bill Payments": "ബിൽ പേയ്‌മെന്റുകൾ",
+    "Banking Services": "ബാങ്കിംഗ് സേവനങ്ങൾ",
+    "Business Tools": "ബിസിനസ് ടൂളുകൾ",
+    "More Services": "കൂടുതൽ സേവനങ്ങൾ"
+  },
+  "items": {
+    "mobile": "മൊബൈൽ",
+    "dth": "DTH",
+    "subscription": "സബ്‌സ്ക്രിപ്ഷൻ",
+    "postpaid": "പോസ്റ്റ്പെയ്ഡ്",
+    "lpg": "LPG ഗ്യാസ്",
+    "creditcard": "ക്രെഡിറ്റ് കാർഡ്",
+    "loanrepayment": "വായ്പ തിരിച്ചടവ്",
+    "electricity": "വൈദ്യുതി",
+    "water": "വാട്ടർ",
+    "gas": "ഗ്യാസ്",
+    "fastag": "FASTag",
+    "aeps": "AEPS",
+    "dmt": "മണി ട്രാൻസ്ഫർ",
+    "aadhaarpay": "ആധാർ പേ",
+    "ministmt": "മിനി സ്റ്റേറ്റ്‌മെന്റ്",
+    "cashdep": "ക്യാഷ് ഡിപ്പോസിറ്റ്",
+    "matm": "മൈക്രോ എടിഎം",
+    "khaata": "ഖാത ബുക്ക്",
+    "qr": "എന്റെ QR കോഡ്",
+    "reports": "റിപ്പോർട്ടുകൾ",
+    "discount": "ഡിസ്കൗണ്ട് ചാർട്ട്",
+    "insurance": "ഇൻഷുറൻസ്",
+    "pan": "പാൻ കാർഡ്",
+    "travel": "ബസ് ബുക്കിംഗ്"
+  }
+}

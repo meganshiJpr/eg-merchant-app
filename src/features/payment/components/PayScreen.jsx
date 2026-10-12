@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { usePay } from "../store";
 import { useWallet } from "@/lib/store/wallet";
 import { useToast } from "@/components/ui/Toast";
@@ -29,6 +30,7 @@ function statusFromPin(pin) {
 
 export function PayScreen() {
   const router = useRouter();
+  const { t } = useTranslation(["recharge", "common"]);
   const req = usePay((s) => s.req);
   const flow = useRecharge();
   const wallet = useWallet();
@@ -148,7 +150,6 @@ export function PayScreen() {
         billAmount: amount,
         totalAmount: amount,
         dateTime: new Date().toLocaleString("en-IN", { dateStyle: "short", timeStyle: "short" }),
-        initiatingChannel: "Agent App",
         mode: req.mode,
         retryHref: status === "failed" || status === "refunded" ? req.backHref : null,
         rows: req.receiptRows(amount, via, txnId),
@@ -172,15 +173,13 @@ export function PayScreen() {
     }, 1200);
   }
 
-  // console.log("request from the operator",req)
-
   const btnLabel = !amtOk
     ? `Enter Rs ${inr(req.amin)} – ${inr(req.amax)}`
     : short > 0
       ? upiOnly
         ? `Pay Rs ${inr(short)} via UPI`
         : `Add Rs ${inr(short)} & Proceed`
-      : `${req.mode === "bill" ? "Proceed to pay" : "Recharge"}`;
+      : `${req.mode === "bill" ? t("payment.payNow", "Proceed to pay") : t("payment.payNow", "Recharge")}`;
 
   return (
     <div className="flex flex-col gap-3 p-4 pb-24">
@@ -265,7 +264,7 @@ export function PayScreen() {
             onClick={() => setShowPlans(true)}
             className="mt-2.5 inline-flex items-center gap-1.5 text-[12.5px] font-bold text-primary active:scale-95 transition cursor-pointer hover:underline"
           >
-            <span>View plan</span>
+            <span>{t("recharge:payment.viewPlan", "View plan")}</span>
           </button>
         )}
       </div>
@@ -387,7 +386,7 @@ export function PayScreen() {
           {loadingBillerPayment ? (
             <>
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              <span>Fetching payment details...</span>
+              <span>{t("recharge:payment.fetchingDetails", "Fetching payment details...")}</span>
             </>
           ) : (
             <>

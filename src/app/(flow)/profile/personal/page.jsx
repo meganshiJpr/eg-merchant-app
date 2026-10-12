@@ -8,7 +8,7 @@ export default function PersonalPage() {
   const toast = useToast((t) => t.show);
   return (
     <>
-      <SubHeader title="Personal Details" backHref="/profile" />
+      <SubHeader title="Personal Details" backHref="/profile" showImg={false}/>
       <div className="p-4">
         <div className="rounded-2xl border border-border bg-surface px-4 py-1">
           <DetailRow label="Full name" value="Ramesh Kumar" />

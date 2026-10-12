@@ -1,0 +1,37 @@
+{
+  "title": "হোম",
+  "viewAll": "সব দেখুন",
+  "groups": {
+    "Recharges": "রিচার্জ",
+    "Bill Payments": "বিল পেমেন্ট",
+    "Banking Services": "ব্যাংকিং পরিষেবা",
+    "Business Tools": "বিজনেস টুলস",
+    "More Services": "আরও পরিষেবা"
+  },
+  "items": {
+    "mobile": "মোবাইল",
+    "dth": "DTH",
+    "subscription": "সাবস্ক্রিপশন",
+    "postpaid": "পোস্টপেইড",
+    "lpg": "LPG গ্যাস",
+    "creditcard": "ক্রেডিট কার্ড",
+    "loanrepayment": "ঋণ পরিশোধ",
+    "electricity": "বিদ্যুৎ",
+    "water": "জল",
+    "gas": "গ্যাস",
+    "fastag": "FASTag",
+    "aeps": "AEPS",
+    "dmt": "মানি ট্রান্সফার",
+    "aadhaarpay": "আধার পে",
+    "ministmt": "মিনি স্টেটমেন্ট",
+    "cashdep": "ক্যাশ ডিপোজিট",
+    "matm": "মাইক্রো এটিএম",
+    "khaata": "খাতা বুক",
+    "qr": "আমার QR কোড",
+    "reports": "রিপোর্ট",
+    "discount": "ডিসকাউন্ট চার্ট",
+    "insurance": "ইন্স্যুরেন্স",
+    "pan": "প্যান কার্ড",
+    "travel": "বাস বুকিং"
+  }
+}

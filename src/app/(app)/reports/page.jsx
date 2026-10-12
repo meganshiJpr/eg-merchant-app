@@ -1,33 +1,33 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { useToast } from "@/components/ui/Toast";
-
-const GROUPS = [
-  {
-    title: "Transactions",
-    rows: [
-      { label: "Transactions", sub: "All recharges and bill payments", href: "/reports/transactions", c: "var(--primary)", s: "var(--primary-soft)" },
-      { label: "Disputes & Complaints", sub: "Raised complaints and their status", href: "/reports/disputes", c: "var(--orange)", s: "var(--orange-soft)" },
-      // { label: "AEPS Reports", sub: "Withdrawals, deposits, mini statements", c: "var(--teal)", s: "var(--teal-soft)" },
-      // { label: "Money Transfer Reports", sub: "DMT transaction history", c: "var(--violet)", s: "var(--violet-soft)" },
-    ],
-  },
-  {
-    title: "Account",
-    rows: [
-      { label: "Wallet Ledger", sub: "Every credit and debit in your wallet", href: "/reports/ledger", c: "var(--primary)", s: "var(--primary-soft)" },
-      // { label: "Commission Report", sub: "Earnings by service and by day", href: "/reports/commission", c: "var(--teal)", s: "var(--teal-soft)" },
-      { label: "Deposit Reports", sub: "Online wallet top-ups via UPI", href: "/reports/deposits", c: "var(--teal)", s: "var(--teal-soft)" },
-      { label: "Manual Deposit Requests", sub: "Status of your deposit requests", href: "/reports/manual-deposits", c: "var(--orange)", s: "var(--orange-soft)" },
-      { label: "Refund Report", sub: "Failed transaction refunds",href: "/reports/refund-report", c: "var(--violet)", s: "var(--violet-soft)" },
-    ],
-  },
-];
 
 export default function ReportsPage() {
   const router = useRouter();
+  const { t } = useTranslation("reports");
   const toast = useToast((t) => t.show);
+
+  const GROUPS = [
+    {
+      title: t("main.transactionsHeader"),
+      rows: [
+        { label: t("main.transactionsHeader"), sub: t("main.transactionsSub"), href: "/reports/transactions", c: "var(--primary)", s: "var(--primary-soft)" },
+        { label: t("main.disputesTitle"), sub: t("main.disputesSub"), href: "/reports/disputes", c: "var(--orange)", s: "var(--orange-soft)" },
+      ],
+    },
+    {
+      title: t("main.accountHeader"),
+      rows: [
+        { label: t("main.ledgerTitle"), sub: t("main.ledgerSub"), href: "/reports/ledger", c: "var(--primary)", s: "var(--primary-soft)" },
+        { label: t("main.depositsTitle"), sub: t("main.depositsSub"), href: "/reports/deposits", c: "var(--teal)", s: "var(--teal-soft)" },
+        { label: t("main.manualDepositsTitle"), sub: t("main.manualDepositsSub"), href: "/reports/manual-deposits", c: "var(--orange)", s: "var(--orange-soft)" },
+        { label: t("main.refundReportTitle"), sub: t("main.refundReportSub"), href: "/reports/refund-report", c: "var(--violet)", s: "var(--violet-soft)" },
+      ],
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-4 p-4">
       {GROUPS.map((g) => (

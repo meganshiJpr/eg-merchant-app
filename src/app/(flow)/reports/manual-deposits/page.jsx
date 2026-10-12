@@ -6,9 +6,12 @@ import { fetchManualDepositRequests } from "@/features/reports/api";
 import { ReportHeaderFilterBar } from "@/features/reports/components/ReportHeaderFilterBar";
 import { ReportFilterSheet } from "@/features/reports/components/ReportFilterSheet";
 import { inr } from "@/utils/format";
+import { useTranslation } from "react-i18next";
 import { formatRequestTime, generateMonthsList, getDateRange } from "@/utils/transaction";
 
 export default function ManualDepositsPage() {
+
+  const { t } = useTranslation("errors")
   const [historyData, setHistoryData] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -59,7 +62,7 @@ export default function ManualDepositsPage() {
     try {
       const res = await fetchManualDepositRequests(payload);
 
-      const rawItems = res?.history_data || res?.data?.history_data || res?.data || [];
+      const rawItems = res?.history_data || [];
       const items = Array.isArray(rawItems) ? rawItems : [];
 
       if (isAppend) {
@@ -206,8 +209,8 @@ export default function ManualDepositsPage() {
                 <path d="M12 2 3 7v2h18V7Zm-7 9h3v7H5Zm5.5 0h3v7h-3ZM16 11h3v7h-3ZM3 20h18v2H3Z" />
               </svg>
             </div>
-            <h3 className="mt-3 text-[15px] font-bold text-text-1">No Deposit Requests Found</h3>
-            <p className="mt-1 text-[12.5px] text-text-3">Try adjusting your search query or date filters.</p>
+            <h3 className="mt-3 text-[15px] font-bold text-text-1">{t("MANUAL_DEPOSITS")}</h3>
+            <p className="mt-1 text-[12.5px] text-text-3">{t("Filter_Query")}</p>
           </div>
         )}
 

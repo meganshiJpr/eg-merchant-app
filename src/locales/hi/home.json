@@ -1,0 +1,37 @@
+{
+  "title": "होम",
+  "viewAll": "सभी देखें",
+  "groups": {
+    "Recharges": "रिचार्ज",
+    "Bill Payments": "बिल भुगतान",
+    "Banking Services": "बैंकिंग सेवाएं",
+    "Business Tools": "बिजनेस टूल्स",
+    "More Services": "अन्य सेवाएं"
+  },
+  "items": {
+    "mobile": "मोबाइल",
+    "dth": "डीटीएच",
+    "subscription": "सब्सक्रिप्शन",
+    "postpaid": "पोस्टपेड",
+    "lpg": "एलपीजी सिलेंडर",
+    "creditcard": "क्रेडिट कार्ड",
+    "loanrepayment": "लोन रीपेमेंट",
+    "electricity": "बिजली बिल",
+    "water": "पानी का बिल",
+    "gas": "गैस बिल",
+    "fastag": "फास्टैग",
+    "aeps": "एईपीएस",
+    "dmt": "मनी ट्रांसफर",
+    "aadhaarpay": "आधार पे",
+    "ministmt": "मिनी स्टेटमेंट",
+    "cashdep": "कैश डिपॉजिट",
+    "matm": "माइक्रो एटीएम",
+    "khaata": "खाता बुक",
+    "qr": "मेरा क्यूआर कोड",
+    "reports": "रिपोर्ट्स",
+    "discount": "डिस्काउंट चार्ट",
+    "insurance": "बीमा",
+    "pan": "पैन कार्ड",
+    "travel": "बस बुकिंग"
+  }
+}

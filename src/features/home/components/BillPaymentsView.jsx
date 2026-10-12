@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { fetchDashboardData } from "@/features/dashboard/api";
 import { ServiceIcon } from "../ServiceIcon";
 import { allBillPaymentGroups as fallbackGroups } from "../services";
 
 export function BillPaymentsView({ onClose }) {
+  const { t } = useTranslation("home");
   const [bbpsGroups, setBbpsGroups] = useState([]);
   const [baseImgPath, setBaseImgPath] = useState("https://staging.paybyapis.com/images/icons");
   const [loading, setLoading] = useState(true);
@@ -57,11 +59,9 @@ export function BillPaymentsView({ onClose }) {
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="font-display text-[17px] font-bold">Bill Payments</h1>
+          <h1 className="font-display text-[17px] font-bold">{t("groups.Bill Payments", "Bill Payments")}</h1>
         </div>
-        {/* <div className="flex items-center justify-end gap-1.5 px-4 pt-3 pb-1"> */}
         <img src="/bharat-connect-reverse-logo.png" alt="Bharat Connect" className="h-[2.55rem] object-contain" />
-      {/* </div> */}
       </div>
 
       {/* 2. SCROLLABLE CONTENT BODY */}
@@ -73,7 +73,8 @@ export function BillPaymentsView({ onClose }) {
           </div>
         ) : (
           bbpsGroups.map((group, gIdx) => {
-            const groupTitle = group.title || group.name || "Services";
+            const rawTitle = group.title || group.name || "Services";
+            const groupTitle = t(`groups.${rawTitle}`, rawTitle);
             const subMenus = group.sub_menus || group.items || [];
 
             return (
@@ -106,20 +107,17 @@ export function BillPaymentsView({ onClose }) {
                       ? (iconFileName.startsWith("http") ? iconFileName : `${baseImgPath}/${iconFileName}`)
                       : null;
 
-                    const badgeTxt = item.offer_txt || (item.isNew ? "New" : "");
+                    const rawItemLabel = item.name || item.label || "";
+                    const itemKey = item.key || rawItemLabel.toLowerCase().replace(/\s+/g, "");
+                    const itemLabel = t(`items.${itemKey}`, rawItemLabel);
 
                     const inner = (
                       <div className="relative flex flex-col items-center gap-1.5 active:scale-95 transition">
-                        {/* {badgeTxt ? (
-                          <span className="absolute -top-1.5 right-0 z-10 rounded-full bg-rose-500 px-1.5 py-0.5 text-[8.5px] font-extrabold text-white shadow-2xs">
-                            {badgeTxt}
-                          </span>
-                        ) : null} */}
                         <span className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-200/70 bg-blue-50/50 shadow-2xs overflow-hidden">
                           {iconUrl ? (
                             <img
                               src={iconUrl}
-                              alt={item.name || item.label}
+                              alt={itemLabel}
                               className="h-7 w-7 object-contain"
                               onError={(e) => {
                                 e.target.style.display = "none";
@@ -132,7 +130,7 @@ export function BillPaymentsView({ onClose }) {
                           </span>
                         </span>
                         <span className="text-center text-[11px] font-medium leading-tight text-text-1 min-h-[26px] flex items-center justify-center">
-                          {item.name || item.label}
+                          {itemLabel}
                         </span>
                       </div>
                     );

@@ -1,0 +1,37 @@
+{
+  "title": "ಮುಖಪುಟ",
+  "viewAll": "ಎಲ್ಲವನ್ನೂ ವೀಕ್ಷಿಸಿ",
+  "groups": {
+    "Recharges": "ರೀಚಾರ್ಜ್‌ಗಳು",
+    "Bill Payments": "ಬಿಲ್ ಪಾವತಿಗಳು",
+    "Banking Services": "ಬ್ಯಾಂಕಿಂಗ್ ಸೇವೆಗಳು",
+    "Business Tools": "ವ್ಯಾಪಾರ ಉಪಕರಣಗಳು",
+    "More Services": "ಹೆಚ್ಚಿನ ಸೇವೆಗಳು"
+  },
+  "items": {
+    "mobile": "ಮೊಬೈಲ್",
+    "dth": "DTH",
+    "subscription": "ಚಂದಾದಾರಿಕೆ",
+    "postpaid": "ಪೋಸ್ಟ್‌ಪೇಡ್",
+    "lpg": "LPG ಗ್ಯಾಸ್",
+    "creditcard": "ಕ್ರೆಡಿಟ್ ಕಾರ್ಡ್",
+    "loanrepayment": "ಸಾಲ ಮರುಪಾವತಿ",
+    "electricity": "ವಿದ್ಯುತ್",
+    "water": "ನೀರು",
+    "gas": "ಗ್ಯಾಸ್",
+    "fastag": "FASTag",
+    "aeps": "AEPS",
+    "dmt": "ಹಣ ವರ್ಗಾವಣೆ",
+    "aadhaarpay": "ಆಧಾರ್ ಪೇ",
+    "ministmt": "ಮಿನಿ ಸ್ಟೇಟ್‌ಮೆಂಟ್",
+    "cashdep": "ನಗದು ಠೇವಣಿ",
+    "matm": "ಮೈಕ್ರೋ ಎಟಿಎಂ",
+    "khaata": "ಖಾತಾ ಬುಕ್",
+    "qr": "ನನ್ನ QR ಕೋಡ್",
+    "reports": "ವರದಿಗಳು",
+    "discount": "ರಿಯಾಯಿತಿ ಚಾರ್ಟ್",
+    "insurance": "ವಿಮೆ",
+    "pan": "ಪ್ಯಾನ್ ಕಾರ್ಡ್",
+    "travel": "ಬಸ್ ಬುಕಿಂಗ್"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "home": "ഹോം",
+    "reports": "റിപ്പോർട്ടുകൾ",
+    "khaata": "ഖാത",
+    "profile": "പ്രൊഫൈൽ",
+    "scanPay": "സ്കാൻ & പേ"
+  },
+  "header": {
+    "walletBalance": "വാലറ്റ് ബാലൻസ്"
+  },
+  "buttons": {
+    "submit": "സമർപ്പിക്കുക",
+    "cancel": "റദ്ദാക്കുക",
+    "confirm": "ഉറപ്പാക്കുക",
+    "update": "അപ്ഡേറ്റ് ചെയ്യുക",
+    "back": "തിരികെ",
+    "close": "അടയ്ക്കുക"
+  },
+  "labels": {
+    "mpin": "M PIN",
+    "mobileNumber": "മൊബൈൽ നമ്പർ",
+    "accountNumber": "അക്കൗണ്ട് നമ്പർ",
+    "status": "സ്റ്റാറ്റസ്"
+  },
+  "status": {
+    "verified": "സ്ഥിരീകരിച്ചു",
+    "processing": "പ്രോസസ്സ് ചെയ്യുന്നു",
+    "rejected": "നിരസിച്ചു",
+    "pending": "പെൻഡിങ്",
+    "approved": "അംഗീകരിച്ചു"
+  }
+}

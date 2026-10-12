@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Sheet } from "@/components/ui/Sheet";
 import { useToast } from "@/components/ui/Toast";
 import { UpdateMpin } from "@/features/profile/api";
 
 export function ChangePinSheet({ open, onClose }) {
+  const { t } = useTranslation(["profile", "common"]);
   const toast = useToast((t) => t.show);
   const [cur, setCur] = useState("");
   const [next, setNext] = useState("");
@@ -28,13 +30,13 @@ export function ChangePinSheet({ open, onClose }) {
 
   async function submit() {
     if (cur.length !== 4 || next.length !== 4 || conf.length !== 4) {
-      return setErr("All PINs must be 4 digits.");
+      return setErr(t("profile:changePin.errLength"));
     }
     if (next !== conf) {
-      return setErr("New PIN and confirmation do not match.");
+      return setErr(t("profile:changePin.errMismatch"));
     }
     if (next === cur) {
-      return setErr("New PIN must be different from the current one.");
+      return setErr(t("profile:changePin.errSame"));
     }
 
     setErr("");
@@ -52,7 +54,7 @@ export function ChangePinSheet({ open, onClose }) {
         res?.message ||
         res?.msg ||
         res?.data?.message ||
-        (isSuccess ? "MPIN updated successfully!" : "Failed to update MPIN. Please try again.");
+        (isSuccess ? t("profile:changePin.successMsg", "MPIN updated successfully!") : t("profile:changePin.errMsg", "Failed to update MPIN. Please try again."));
 
       if (isSuccess) {
         toast(msg);
@@ -63,7 +65,7 @@ export function ChangePinSheet({ open, onClose }) {
       }
     } catch (error) {
       const errMsg =
-        error?.data?.message || error?.message || "Failed to update MPIN. Please try again.";
+        error?.data?.message || error?.message || t("profile:changePin.errMsg", "Failed to update MPIN. Please try again.");
       setErr(errMsg);
     } finally {
       setLoading(false);
@@ -90,11 +92,11 @@ export function ChangePinSheet({ open, onClose }) {
 
   return (
     <Sheet open={open} onClose={handleClose}>
-      <div className="mb-3 font-display text-[15px] font-semibold">Change MPIN</div>
+      <div className="mb-3 font-display text-[15px] font-semibold">{t("profile:changePin.title")}</div>
       <div className="flex flex-col gap-3">
-        {field("Current MPIN", cur, setCur)}
-        {field("New MPIN", next, setNext)}
-        {field("Confirm New MPIN", conf, setConf)}
+        {field(t("profile:changePin.currentMpin"), cur, setCur)}
+        {field(t("profile:changePin.newMpin"), next, setNext)}
+        {field(t("profile:changePin.confirmMpin"), conf, setConf)}
       </div>
       {err && <div className="mt-2.5 text-[11.5px] font-semibold text-accent">{err}</div>}
       <button
@@ -103,7 +105,7 @@ export function ChangePinSheet({ open, onClose }) {
         onClick={submit}
         className="mt-4 w-full rounded-xl bg-primary px-4 py-3.5 font-display text-[13.5px] font-semibold text-white transition active:scale-98 disabled:opacity-50"
       >
-        {loading ? "Updating..." : "Update MPIN"}
+        {loading ? t("profile:changePin.submitting") : t("profile:changePin.submitButton")}
       </button>
     </Sheet>
   );

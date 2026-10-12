@@ -2,16 +2,18 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { serviceGroups } from "./services";
 import { useToast } from "@/components/ui/Toast";
 import { ServiceIcon } from "./ServiceIcon";
 import { fetchOperatorsList } from "@/features/dashboard/api";
 import { BillPaymentsView } from "./components/BillPaymentsView";
 
-
-
 function Tile({ s }) {
+  const { t } = useTranslation("home");
   const toast = useToast((t) => t.show);
+  const labelText = t(`items.${s.key}`, s.label);
+
   const inner = (
     <>
       <span
@@ -21,8 +23,7 @@ function Tile({ s }) {
         <ServiceIcon name={s.key} color={s.color} />
       </span>
       <span className="text-center text-[11px] font-medium leading-tight text-text-2">
-        {/* title of the icon */}
-        {s.label} 
+        {labelText}
       </span>
     </>
   );
@@ -33,13 +34,14 @@ function Tile({ s }) {
       {inner}
     </Link>
   ) : (
-    <button className={cls} onClick={() => toast(`${s.label} — coming in a later milestone`)}>
+    <button className={cls} onClick={() => toast(`${labelText} — coming in a later milestone`)}>
       {inner}
     </button>
   );
 }
 
 export function ServiceGrid() {
+  const { t } = useTranslation("home");
   const [showAllBills, setShowAllBills] = useState(false);
   const hasFetchedRef = useRef(false);
 
@@ -66,14 +68,14 @@ export function ServiceGrid() {
             {g.logo === true && (
               <img src="/B-mnemonic.jpg" alt="Bharat Connect" className="h-6"/>
             )}
-            <h2 className="font-display text-[13px] font-semibold">{g.title}</h2>
+            <h2 className="font-display text-[13px] font-semibold">{t(`groups.${g.title}`, g.title)}</h2>
             {g.viewAll === true && (
               <button
                 type="button"
                 onClick={() => setShowAllBills(true)}
                 className="ml-auto h-6 text-[11px] w-auto text-primary font-semibold hover:underline"
               >
-                View All
+                {t("viewAll", "View All")}
               </button>
             )}
           </div>

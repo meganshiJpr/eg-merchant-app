@@ -2,9 +2,11 @@
 
 import { useEffect } from "react";
 import { useSessionExpiryStore } from "@/lib/auth/sessionExpiryStore";
+import { useTranslation } from "react-i18next";
 
 export function SessionExpiredOverlay() {
   const expired = useSessionExpiryStore((state) => state.expired);
+  const { t } = useTranslation("errors");
 
   useEffect(() => {
     if (!expired) return undefined;
@@ -34,10 +36,10 @@ export function SessionExpiredOverlay() {
           </svg>
         </div>
         <h2 id="session-expired-title" className="mt-4 font-display text-[17px] font-semibold text-text-1">
-          Session expired
+          {t("SESSION_EXPIRED", "Session expired")}
         </h2>
         <p id="session-expired-description" className="mt-2 text-[12.5px] leading-relaxed text-text-2">
-          For your security, this session is no longer active. Please close this tab or application and reopen EG Merchant from your dashboard.
+          {t("SESSION_EXPIRED_DESC", "For your security, this session is no longer active. Please close this tab or application and reopen EG Merchant from your dashboard.")}
         </p>
       </div>
     </div>

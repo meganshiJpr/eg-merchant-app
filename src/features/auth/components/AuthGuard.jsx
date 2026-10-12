@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/lib/auth/store";
 import { useSessionExpiryStore } from "@/lib/auth/sessionExpiryStore";
 
@@ -10,7 +10,11 @@ export function AuthGuard({ children }) {
   const token = useAuthStore((s) => s.token);
   const sessionExpired = useSessionExpiryStore((s) => s.expired);
   const router = useRouter();
+  const pathname = usePathname();
   const [showLogin, setShowLogin] = useState(false);
+
+  // /profile-details and /sso route paths are unauthenticated onboarding views
+  const isPublicOnboarding = pathname === "/profile-details" || pathname?.startsWith("/sso");
 
   useEffect(() => {
     if (hydrated && !token) setShowLogin(true);
@@ -29,7 +33,7 @@ export function AuthGuard({ children }) {
   // The overlay makes it inert, so no expired-screen action can be used.
   if (sessionExpired) return <>{children}</>;
 
-  if (!token || showLogin) {
+  if ((!token || showLogin) && !isPublicOnboarding) {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4 p-8 text-center">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-soft">

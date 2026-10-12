@@ -1,0 +1,24 @@
+{
+  "title": "রিপোর্ট",
+  "main": {
+    "transactionsHeader": "লেনদেন",
+    "transactionsSub": "সমস্ত রিচার্জ এবং বিল পেমেন্ট",
+    "disputesTitle": "অভিযোগ ও বিরোধ",
+    "disputesSub": "জমা দেওয়া অভিযোগ এবং তাদের অবস্থা",
+    "accountHeader": "অ্যাকাউন্ট",
+    "ledgerTitle": "ওয়ালেট লেজার",
+    "ledgerSub": "আপনার ওয়ালেটের প্রতিটি ক্রেডিট ও ডেবিট",
+    "depositsTitle": "ডিপোজিট রিপোর্ট",
+    "depositsSub": "UPI এর মাধ্যমে অনলাইন ওয়ালেট টপ-আপ",
+    "manualDepositsTitle": "ম্যানুয়াল ডিপোজিট অনুরোধ",
+    "manualDepositsSub": "আপনার ডিপোজিট অনুরোধের অবস্থা",
+    "refundReportTitle": "রিফান্ড রিপোর্ট",
+    "refundReportSub": "ব্যর্থ লেনদেনের রিফান্ড"
+  },
+  "filters": {
+    "title": "রিপোর্ট ফিল্টার করুন",
+    "apply": "ফিল্টার প্রয়োগ করুন",
+    "reset": "রিসেট করুন",
+    "searchPlaceholder": "কীওয়ার্ড / অর্ডার ID দিয়ে খুঁজুন"
+  }
+}

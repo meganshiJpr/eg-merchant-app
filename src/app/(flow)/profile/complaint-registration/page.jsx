@@ -21,7 +21,7 @@ export default function ComplaintRegistration() {
   return (
     <>
     <SubHeader title="Complaint Registration" backHref="/profile" />
-    <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+    <div className=" border border-border bg-surface p-4 shadow-sm">
 
       <div className="my-4 border-t border-border" />
 
@@ -64,14 +64,14 @@ export default function ComplaintRegistration() {
          <>
             {/* B-Connect TXN ID */}
             <div>
-              <label className="mb-2 block text-[14px] font-semibold text-text">
+              <label className="mb-2 block text-[14px] font-medium text-text">
                 B-Connect TXN ID
               </label>
 
               <input
                 type="text"
                 placeholder="B-Connect TXN ID"
-                className="h-12 w-full rounded-xl border border-border bg-page px-4 text-[14px] text-text outline-none focus:border-primary"
+                className="h-12 w-full rounded-full border border-border bg-page px-4 text-[14px] text-text outline-none focus:border-primary"
               />
             </div>
 
@@ -86,50 +86,50 @@ export default function ComplaintRegistration() {
 
             {/* Mobile Number */}
             <div>
-              <label className="mb-2 block text-[14px] font-semibold text-text">
+              <label className="mb-2 block text-[14px] font-medium text-text">
                 Mobile Number
               </label>
 
               <input
                 type="tel"
                 placeholder="Mobile Number"
-                className="h-12 w-full rounded-xl border border-border bg-page px-4 text-[14px] text-text outline-none focus:border-primary"
+                className="h-12 w-full rounded-full border border-border bg-page px-4 text-[14px] text-text outline-none focus:border-primary"
               />
             </div>
 
             {/* Dates */}
             <div className="grid grid-row-2 gap-3">
               <div>
-                <label className="mb-2 block text-[14px] font-semibold text-text">
+                <label className="mb-2 block text-[14px] font-medium text-text">
                   Start Date
                 </label>
 
                 <input
                   type="date"
-                  className="h-12 w-[22.3rem] sm:w-full bg-page rounded-xl border border-border px-3 text-[13px] text-text outline-none focus:border-primary"
+                  className="h-12 w-[22.3rem] sm:w-full bg-page rounded-full border border-border px-3 text-[13px] text-text outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-[14px] font-semibold text-text">
+                <label className="mb-2 block text-[14px] font-medium text-text">
                   End Date
                 </label>
 
                 <input
                   type="date"
-                  className="h-12 w-[22.3rem] sm:w-full rounded-xl border border-border bg-page px-3 text-[13px] text-text outline-none focus:border-primary"
+                  className="h-12 w-[22.3rem] sm:w-full rounded-full border border-border bg-page px-3 text-[13px] text-text outline-none focus:border-primary"
                 />
               </div>
             </div>
 
             {/* Complaint Disposition */}
             <div>
-              <label className="mb-2 block text-[14px] font-semibold text-text">
+              <label className="mb-2 block text-[14px] font-medium text-text">
                 Complaint Disposition
               </label>
 
                  <select
-                   className="w-full max-w-full rounded-xl border border-border bg-page px-4 py-3 text-[14px] text-text-2 outline-none focus:border-primary"
+                   className="w-full max-w-full rounded-full border border-border bg-page px-4 py-3 text-[14px] text-text-2 outline-none focus:border-primary"
                   defaultValue=""
                     >
                  <option value="" disabled>
@@ -146,7 +146,7 @@ export default function ComplaintRegistration() {
 
             {/* Complaint Description */}
             <div>
-              <label className="mb-2 block text-[14px] font-semibold text-text">
+              <label className="mb-2 block text-[14px] font-medium text-text">
                 Complaint Description
               </label>
 
@@ -168,7 +168,7 @@ export default function ComplaintRegistration() {
               <input
                 type="text"
                 placeholder="Enter Complaint Id"
-                className="h-12 w-full rounded-xl border border-border bg-page px-4 text-[14px] text-text outline-none transition focus:border-primary"
+                className="h-12 w-full rounded-full border border-border bg-page px-4 text-[14px] text-text outline-none transition focus:border-primary"
               />
             </div>  
             

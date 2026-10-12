@@ -1,0 +1,24 @@
+{
+  "title": "रिपोर्ट्स",
+  "main": {
+    "transactionsHeader": "लेन-देन (Transactions)",
+    "transactionsSub": "सभी रिचार्ज और बिल भुगतान",
+    "disputesTitle": "शिकायतें (Disputes & Complaints)",
+    "disputesSub": "दर्ज शिकायतें और उनकी स्थिति",
+    "accountHeader": "खाता विवरण",
+    "ledgerTitle": "वॉलेट लेजर",
+    "ledgerSub": "आपके वॉलेट में हर क्रेडिट और डेबिट",
+    "depositsTitle": "डिपॉजिट रिपोर्ट",
+    "depositsSub": "यूपीआई के माध्यम से ऑनलाइन वॉलेट टॉप-अप",
+    "manualDepositsTitle": "मैनुअल डिपॉजिट अनुरोध",
+    "manualDepositsSub": "आपके डिपॉजिट अनुरोधों की स्थिति",
+    "refundReportTitle": "रिफंड रिपोर्ट",
+    "refundReportSub": "विफल लेन-देन रिफंड"
+  },
+  "filters": {
+    "title": "फिल्टर करें",
+    "apply": "फिल्टर लागू करें",
+    "reset": "रीसेट करें",
+    "searchPlaceholder": "कीवर्ड / ऑर्डर आईडी द्वारा खोजें"
+  }
+}

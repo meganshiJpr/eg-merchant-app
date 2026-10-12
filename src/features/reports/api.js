@@ -30,7 +30,7 @@ export async function fetchTransactionHistory({
     throw error;
   }
 }
-
+  
 export async function fetchTransactionHistorySuccessDetails({order_id}) {
     try {
         const data = await apish("rechargeDetails", {
@@ -44,7 +44,7 @@ export async function fetchTransactionHistorySuccessDetails({order_id}) {
         console.error("fetchTransactionHistorySuccessDetails Error:", error);
         throw error;
     }
-}
+}  
 
 export async function fetchWalletHistory({
     page = 1,

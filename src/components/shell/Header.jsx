@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/lib/auth/store";
 import { useBalance } from "@/features/wallet/hooks/useBalance";
 import { useDashboard } from "@/features/dashboard/hooks/useDashboard";
+import { useTranslation } from "react-i18next";
 
 function greeting() {
   const h = new Date().getHours();
@@ -23,6 +24,7 @@ export function Header() {
   const shop = merchant?.shopName || "Your Shop";
   const { data, isLoading, isError } = useBalance();
   const { data: dashboardData, isLoading: dashboardLoading } = useDashboard();
+  const { t } = useTranslation("common");
 
   const name = dashboardData?.name || shop;
 
@@ -35,7 +37,7 @@ export function Header() {
         <div className="min-w-0">
           <div className="text-[11px] text-text-3">{greeting()}</div>
           <div className="truncate text-[13.5px] font-semibold">
-            {dashboardLoading ? "Loading..." : name}
+            {dashboardLoading ? t("status.processing", "Loading...") : name}
           </div>
         </div>
       </Link>
@@ -55,7 +57,7 @@ export function Header() {
       </Link>
 
       <Link
-        href="/support"
+        href="/profile/support"
         aria-label="Help and support"
         className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-primary-soft"
       >

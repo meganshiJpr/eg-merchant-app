@@ -35,6 +35,12 @@ async function hkdfSha256(ikm, saltHexString, info, len) {
 
 export class ApishCodec {
   async encode(payload) {
+    if (typeof FormData !== "undefined" && payload instanceof FormData) {
+      return {
+        body: payload,
+        headers: {},
+      };
+    }
     const mt = randHex(16);
     const no = randHex(24);
     const gb = randHex(32);

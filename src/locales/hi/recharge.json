@@ -1,0 +1,35 @@
+{
+  "title": "मोबाइल रिचार्ज",
+  "numberEntry": {
+    "customerMobile": "ग्राहक मोबाइल नंबर",
+    "searchPlaceholder": "नाम खोजें या नंबर दर्ज करें",
+    "detecting": "ऑपरेटर और सर्कल का पता लगाया जा रहा है...",
+    "noMatch": "आपकी सूची में कोई मेल नहीं मिला — पूरा नंबर टाइप करते रहें",
+    "noContact": "कोई संपर्क नहीं मिला",
+    "myNumber": "मेरा नंबर",
+    "selfTag": "खुद का",
+    "recentTitle": "हाल के रिचार्ज",
+    "viewAll": "सभी देखें",
+    "recentTag": "हाल का",
+    "allContact": "सभी संपर्क",
+    "contactTag": "संपर्क",
+    "selectOperator": "ऑपरेटर चुनें",
+    "selectCircle": "सर्कल चुनें",
+    "change": "बदलें"
+  },
+  "plans": {
+    "searchPlaceholder": "प्लांन राशि या डेटा खोजें",
+    "validity": "वैधता",
+    "data": "डेटा",
+    "selectButton": "प्लांन चुनें",
+    "allPlans": "सभी प्लान"
+  },
+  "payment": {
+    "title": "भुगतान विवरण",
+    "mobileLabel": "मोबाइल नंबर",
+    "operatorLabel": "ऑपरेटर",
+    "amountLabel": "राशि",
+    "payButton": "₹{{amount}} का भुगतान करें",
+    "payNow": "अभी भुगतान करें"
+  }
+}

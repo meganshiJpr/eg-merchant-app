@@ -1,0 +1,35 @@
+{
+  "title": "ಮೊಬೈಲ್ ರೀಚಾರ್ಜ್",
+  "numberEntry": {
+    "customerMobile": "ಗ್ರಾಹಕರ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+    "searchPlaceholder": "ಹೆಸರನ್ನು ಹುಡುಕಿ ಅಥವಾ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ",
+    "detecting": "ಆಪರೇಟರ್ ಮತ್ತು ಸರ್ಕಲ್ ಅನ್ನು ಪತ್ತೆಮಾಡಲಾಗುತ್ತಿದೆ...",
+    "noMatch": "ನಿಮ್ಮ ಪಟ್ಟಿಯಲ್ಲಿ ಯಾವುದೇ ಪಂದ್ಯವಿಲ್ಲ — ಪೂರ್ಣ ಸಂಖ್ಯೆಯನ್ನು ಟೈಪ್ ಮಾಡಿ",
+    "noContact": "ಯಾವುದೇ ಸಂಪರ್ಕ ಕಂಡುಬಂದಿಲ್ಲ",
+    "myNumber": "ನನ್ನ ಸಂಖ್ಯೆ",
+    "selfTag": "ಸ್ವಂತ",
+    "recentTitle": "ಇತ್ತೀಚಿನ ರೀಚಾರ್ಜ್‌ಗಳು",
+    "viewAll": "ಎಲ್ಲವನ್ನೂ ವೀಕ್ಷಿಸಿ",
+    "recentTag": "ಇತ್ತೀಚಿನ",
+    "allContact": "ಎಲ್ಲಾ ಸಂಪರ್ಕಗಳು",
+    "contactTag": "ಸಂಪರ್ಕ",
+    "selectOperator": "ಆಪರೇಟರ್ ಆಯ್ಕೆಮಾಡಿ",
+    "selectCircle": "ಸರ್ಕಲ್ ಆಯ್ಕೆಮಾಡಿ",
+    "change": "ಬದಲಾಯಿಸಿ"
+  },
+  "plans": {
+    "searchPlaceholder": "ಪ್ಲಾನ್ ಮೊತ್ತ ಅಥವಾ ಡೇಟಾ ಹುಡುಕಿ",
+    "validity": "ಸಿಂಧುತ್ವ",
+    "data": "ಡೇಟಾ",
+    "selectButton": "ಪ್ಲಾನ್ ಆಯ್ಕೆಮಾಡಿ",
+    "allPlans": "ಎಲ್ಲಾ ಪ್ಲಾನ್‌ಗಳು"
+  },
+  "payment": {
+    "title": "ಪಾವತಿ ವಿವರಗಳು",
+    "mobileLabel": "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+    "operatorLabel": "ಆಪರೇಟರ್",
+    "amountLabel": "ಮೊತ್ತ",
+    "payButton": "₹{{amount}} ಪಾವತಿಸಿ",
+    "payNow": "ಈಗಲೇ ಪಾವತಿಸಿ"
+  }
+}

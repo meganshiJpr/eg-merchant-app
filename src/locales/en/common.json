@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "home": "Home",
+    "reports": "Reports",
+    "khaata": "Khaata",
+    "profile": "Profile",
+    "scanPay": "Scan & Pay"
+  },
+  "header": {
+    "walletBalance": "Wallet Balance"
+  },
+  "buttons": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "update": "Update",
+    "back": "Back",
+    "close": "Close"
+  },
+  "labels": {
+    "mpin": "M PIN",
+    "mobileNumber": "Mobile Number",
+    "accountNumber": "Account Number",
+    "status": "Status"
+  },
+  "status": {
+    "verified": "Verified",
+    "processing": "Processing",
+    "rejected": "Rejected",
+    "pending": "Pending",
+    "approved": "Approved"
+  }
+}

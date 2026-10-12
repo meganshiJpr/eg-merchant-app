@@ -1,0 +1,35 @@
+{
+  "title": "మొబైల్ రీఛార్జ్",
+  "numberEntry": {
+    "customerMobile": "కస్టమర్ మొబైల్ సంఖ్య",
+    "searchPlaceholder": "పేరు శోధించండి లేదా నంబర్ ఎంటర్ చేయండి",
+    "detecting": "ఆపరేటర్ మరియు సర్కిల్‌ను కనుగొంటోంది...",
+    "noMatch": "మీ జాబితాలో సరిపోలలేదు — పూర్తి నంబర్‌ను టైప్ చేయండి",
+    "noContact": "కాంటాక్ట్ కనుగొనబడలేదు",
+    "myNumber": "నా సంఖ్య",
+    "selfTag": "స్వయంగా",
+    "recentTitle": "ఇటీవలి రీఛార్జ్‌లు",
+    "viewAll": "అన్నీ చూడండి",
+    "recentTag": "ఇటీవలి",
+    "allContact": "అన్ని కాంటాక్ట్‌లు",
+    "contactTag": "కాంటాక్ట్",
+    "selectOperator": "ఆపరేటర్‌ని ఎంచుకోండి",
+    "selectCircle": "సర్కిల్‌ని ఎంచుకోండి",
+    "change": "మార్చండి"
+  },
+  "plans": {
+    "searchPlaceholder": "ప్లాన్ మొత్తం లేదా డేటాని శోధించండి",
+    "validity": "గడువు",
+    "data": "డేటా",
+    "selectButton": "ప్లాన్‌ ఎంచుకోండి",
+    "allPlans": "అన్ని ప్లాన్‌లు"
+  },
+  "payment": {
+    "title": "చెల్లింపు వివరాలు",
+    "mobileLabel": "మొబైల్ సంఖ్య",
+    "operatorLabel": "ఆపరేటర్",
+    "amountLabel": "మొత్తం",
+    "payButton": "₹{{amount}} చెల్లించండి",
+    "payNow": "ఇప్పుడే చెల్లించండి"
+  }
+}

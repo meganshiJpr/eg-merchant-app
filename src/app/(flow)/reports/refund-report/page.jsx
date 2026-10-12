@@ -7,11 +7,13 @@ import { ReportHeaderFilterBar } from "@/features/reports/components/ReportHeade
 import { ReportFilterSheet } from "@/features/reports/components/ReportFilterSheet";
 import { useToast } from "@/components/ui/Toast";
 import { inr } from "@/utils/format";
+import { useTranslation } from "react-i18next";
 import { formatRequestTime, generateMonthsList, getDateRange } from "@/utils/transaction";
 
 export default function RefundReportPage() {
   const toast = useToast((t) => t.show);
 
+  const { t } = useTranslation("errors")
   const [historyData, setHistoryData] = useState([]);
   const [refundMessage, setRefundMessage] = useState(
     "You refund is in progress, you may receive the refund within 3 business days."
@@ -216,8 +218,8 @@ export default function RefundReportPage() {
                 <path d="M3 10h10a5 5 0 0 1 5 5v2M3 10l6-6M3 10l6 6" />
               </svg>
             </div>
-            <h3 className="mt-3 text-[15px] font-bold text-text-1">No Refund Records Found</h3>
-            <p className="mt-1 text-[12.5px] text-text-3">Try adjusting your search query or date filters.</p>
+            <h3 className="mt-3 text-[15px] font-bold text-text-1">{t("REFUND_REQUESTS")}</h3>
+            <p className="mt-1 text-[12.5px] text-text-3">{t("Filter_Query")}</p>
           </div>
         )}
 

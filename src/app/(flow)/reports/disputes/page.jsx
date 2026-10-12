@@ -6,6 +6,7 @@ import { fetchDisputeComplainHistory } from "@/features/reports/api";
 import { ReportHeaderFilterBar } from "@/features/reports/components/ReportHeaderFilterBar";
 import { ReportFilterSheet } from "@/features/reports/components/ReportFilterSheet";
 import { inr } from "@/utils/format";
+import { useTranslation } from "react-i18next";
 import { formatRequestTime, getCategoriesFromSession, generateMonthsList, getDateRange } from "@/utils/transaction";
 
 export default function DisputesPage() {
@@ -31,6 +32,8 @@ export default function DisputesPage() {
   const [customTo, setCustomTo] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
+
+  const { t } = useTranslation("errors");
 
   const [appliedFilters, setAppliedFilters] = useState({
     from: "",
@@ -226,8 +229,8 @@ export default function DisputesPage() {
                 <path d="M12 2 1.5 20.5h21Zm1.1 13.6h-2.2v-5h2.2Zm0 3.4h-2.2v-2.2h2.2Z" />
               </svg>
             </div>
-            <h3 className="mt-3 text-[15px] font-bold text-text-1">No Complaints Found</h3>
-            <p className="mt-1 text-[12.5px] text-text-3">Try adjusting your search query or date filters.</p>
+            <h3 className="mt-3 text-[15px] font-bold text-text-1">{t("COMPLAINTS_NOT_FOUND")}</h3>
+            <p className="mt-1 text-[12.5px] text-text-3">{t("Filter_Query")}</p>
           </div>
         )}
 

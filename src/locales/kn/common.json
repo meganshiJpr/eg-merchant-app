@@ -1,0 +1,33 @@
+{
+  "nav": {
+    "home": "ಮುಖಪುಟ",
+    "reports": "ವರದಿಗಳು",
+    "khaata": "ಖಾತಾ",
+    "profile": "ಪ್ರೊಫೈಲ್",
+    "scanPay": "ಸ್ಕ್ಯಾನ್ & ಪೇ"
+  },
+  "header": {
+    "walletBalance": "ವಾಲೆಟ್ ಬ್ಯಾಲೆನ್ಸ್"
+  },
+  "buttons": {
+    "submit": "ಸಲ್ಲಿಸಿ",
+    "cancel": "ರದ್ದುಮಾಡಿ",
+    "confirm": "ಖಚಿತಪಡಿಸಿ",
+    "update": "ಅಪ್‌ಡೇಟ್ ಮಾಡಿ",
+    "back": "ಹಿಂದಕ್ಕೆ",
+    "close": "ಮುಚ್ಚಿ"
+  },
+  "labels": {
+    "mpin": "M PIN",
+    "mobileNumber": "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+    "accountNumber": "ಖಾತೆ ಸಂಖ್ಯೆ",
+    "status": "ಸ್ಥಿತಿ"
+  },
+  "status": {
+    "verified": "ಪರಿಶೀಲಿಸಲಾಗಿದೆ",
+    "processing": "ಪ್ರಕ್ರಿಯೆಯಲ್ಲಿದೆ",
+    "rejected": "ತಿರಸ್ಕರಿಸಲಾಗಿದೆ",
+    "pending": "ಬಕಿ ಇದೆ",
+    "approved": "ಅನುಮೋದಿಸಲಾಗಿದೆ"
+  }
+}

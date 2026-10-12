@@ -33,7 +33,7 @@ function isExpiredMessage(message) {
 }
 
 export async function request(path, opts = {}) {
-  const { method = "GET", body, auth = true, headers, signal } = opts;
+  const { method = "GET", body, auth = true, headers, signal, baseUrl } = opts;
 
   if (useSessionExpiryStore.getState().expired) {
     throw new ApiError(440, "SESSION_EXPIRED", "Session expired.");
@@ -43,7 +43,7 @@ export async function request(path, opts = {}) {
 
   let res;
   try {
-    res = await transport.send({ method, path, body, headers, token, signal });
+    res = await transport.send({ method, path, body, headers, token, signal, baseUrl });
   } catch (e) {
     console.error(` API Transport Failure [${method} ${path}]:`, e);
     throw new ApiError(0, "NETWORK", "Network error. Please check your connection.", e);

@@ -40,19 +40,54 @@ export function SsoLanding() {
     verifySso(ctx.ssoToken, getClientMeta(), controller.signal)
       .then((res) => {
         const claims = decodeSsoClaims(ctx.ssoToken);
+        const loginToken = res?.logintoken || res?.token || "";
+        const deviceMobile = res?.device || res?.data?.device || "";
+        const isProfileUpdate = res?.is_profile_update === true;
+        const userDetails = res?.user_details || res?.data?.user_details || null;
+
+        const isCompletedKycStatus = res?.is_completed_kyc_status === true || res?.data?.is_completed_kyc_status === true;
+        // const isCompletedKycStatus = false;
+
         const merchant = {
           id: claims?.uid ?? claims?.token ?? "",
           name: claims?.name ?? "",
           shopName: claims?.shopname ?? "",
-          mobile: res.device ?? "",
-          kycStatus: "review",
+          mobile: deviceMobile,
+          kycStatus: isCompletedKycStatus ? "verified" : "pending",
+          isKycCompleted: isCompletedKycStatus,
         };
-        Cookies.set("authToken", res.logintoken, { expires: 1 });
-        Cookies.set("authMobile", res.device ?? "", { expires: 1 });
-        // console.log("Stored authToken:", res.logintoken);
-        // console.log("Stored authMobile:", res.device ?? "");
-        setSession(res.logintoken, merchant, res.device);
-        router.replace("/");
+        
+        console.log("verifyJwt User Response:", res);
+
+        if (isProfileUpdate) {
+          console.log("New user detected (is_profile_update: true). Storing temporary profile data and navigating to /profile-details.");
+          if (typeof window !== "undefined") {
+            const stateDropdownData = res?.state_dropdown_data || res?.data?.state_dropdown_data || [];
+            sessionStorage.setItem(
+              "pending_profile_update",
+              JSON.stringify({
+                tempToken: loginToken,
+                device: deviceMobile,
+                userDetails,
+                user_details: userDetails,
+                merchant,
+                state_dropdown_data: stateDropdownData,
+                rawResponse: res,
+              })
+            );
+          }
+          router.replace("/profile-details");
+        } else {
+          console.log("Existing user detected (is_profile_update: false). Navigating to dashboard.");
+          if (loginToken) {
+            Cookies.set("authToken", loginToken, { expires: 1 });
+          }
+          if (deviceMobile) {
+            Cookies.set("authMobile", deviceMobile, { expires: 1 });
+          }
+          setSession(loginToken, merchant, deviceMobile);
+          router.replace("/");
+        }
       })
       .catch((e) => {
         setPhase("error");
